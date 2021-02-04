@@ -4277,7 +4277,9 @@ MonoBehaviour:
   Key_Right: 275
   Key_Up: 0
   Key_Down: 0
+  Key_Jump: 32
   MoveSpeed: 5
+  JumpPower: 0
 --- !u!1 &2042017823
 GameObject:
   m_ObjectHideFlags: 0

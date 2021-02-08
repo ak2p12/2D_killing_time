@@ -14,8 +14,7 @@ public class MainCharacter : MonoBehaviour
     //========== 캐릭터 정보 ==========//
     public float MoveSpeed; //캐릭터 이동속도
     public float JumpPower; //점프 힘
-    Vector3 a;
-    
+
     float g_Acceleration; //중력 가속도
     float horizontal;   //수평
     float vertical; //수직
@@ -26,11 +25,16 @@ public class MainCharacter : MonoBehaviour
     Animator animater;
     Rigidbody2D rigid;
 
+    public BoxCollider2D HeadCollider;
+    public BoxCollider2D FootCollider;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animater = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody2D>();
+
+        HeadCollider.gameObject.SetActive(false);
         StartCoroutine(Update_Coroutine());
     }
 
@@ -62,20 +66,32 @@ public class MainCharacter : MonoBehaviour
     void Jump()
     {
         //========== 점프
-        if ( (Input.GetKeyDown(Key_Up) || Input.GetKeyDown(Key_Jump)) && false == isJump)
+        if ((Input.GetKeyDown(Key_Up) || Input.GetKeyDown(Key_Jump)) && false == isJump)
         {
+            //점프 할 때 머리 충돌 활성화 (발 충돌 비활성화)
+            HeadCollider.gameObject.SetActive(true);
+            FootCollider.gameObject.SetActive(false);
+
             animater.SetTrigger("Jump");
-            rigid.AddForce(new Vector2(0,JumpPower) , ForceMode2D.Impulse);
+            rigid.AddForce(new Vector2(0, JumpPower), ForceMode2D.Impulse);
             isGround = false;
             isJump = true;
         }
+
+        //땅에 떨어질때 발 충돌 활성화 (머리 충돌 비활성화)
+        if (rigid.velocity.y <= 0)
+        {
+            HeadCollider.gameObject.SetActive(false);
+            FootCollider.gameObject.SetActive(true);
+        }
+
 
         animater.SetFloat("G_Acceleration", rigid.velocity.y);
     }
 
     IEnumerator Update_Coroutine()
     {
-        
+
         while (true)
         {
             Run();
@@ -87,12 +103,15 @@ public class MainCharacter : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 9)
+        //충돌한 객체가 기본 땅이면서 기본 땅과 충돌한 객체가 발인경우
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")) &&
+            (collision.otherCollider.name == "Foot"))
         {
             isGround = true;
             isJump = false;
             animater.SetBool("Ground", isGround);
         }
+
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
@@ -100,7 +119,9 @@ public class MainCharacter : MonoBehaviour
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == 9)
+        //충돌한 객체가 땅이면서 땅과 충돌한 객체가 발인경우
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")) &&
+           (collision.otherCollider.name == "Foot"))
         {
             if (!isJump)
             {

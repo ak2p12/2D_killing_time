@@ -4522,6 +4522,7 @@ MonoBehaviour:
   Key_Up: 0
   Key_Down: 0
   Key_Jump: 32
+  Key_Attack: 97
   MoveSpeed: 10
   JumpPower: 20
   HeadCollider: {fileID: 149888045}
@@ -4533,7 +4534,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2006755117}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0

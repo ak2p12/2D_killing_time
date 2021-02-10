@@ -78,10 +78,11 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 0
-    functionName: AE_SwordAttack
+  - time: 0.2857143
+    functionName: FirstAttack
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 43ea3282868680f4f925372c12ebd267,
+      type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

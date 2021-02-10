@@ -10,6 +10,7 @@ public class MainCharacter : MonoBehaviour
     public KeyCode Key_Up;
     public KeyCode Key_Down;
     public KeyCode Key_Jump;
+    public KeyCode Key_Attack;
 
     //========== 캐릭터 정보 ==========//
     public float MoveSpeed; //캐릭터 이동속도
@@ -18,15 +19,22 @@ public class MainCharacter : MonoBehaviour
     float g_Acceleration; //중력 가속도
     float horizontal;   //수평
     float vertical; //수직
-    bool isGround;    //캐릭터가 땅위에 서있는지 아닌지
-    bool isJump;    //캐릭터가 점프 했는지
+    bool isGround;    //땅위에 서있는지 아닌지
+    bool isJump;    //점프 했는지
 
+    bool isFirstAttack;
+    bool isSecondAttack;
+
+    bool isAttack;  //공격중인지
+    
     SpriteRenderer spriteRenderer;
     Animator animater;
     Rigidbody2D rigid;
 
     public BoxCollider2D HeadCollider;
     public BoxCollider2D FootCollider;
+
+
 
     void Start()
     {
@@ -40,22 +48,20 @@ public class MainCharacter : MonoBehaviour
 
     void Run()
     {
-        horizontal = Input.GetAxis("Horizontal");
-
         //========== 좌우 이동 계산
-        transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
-
-        //========== 오른쪽 이동
-        if (horizontal > 0)
+        if (Input.GetKey(Key_Left) && !isAttack)
         {
-            animater.SetInteger("AnimState", 1);
-            spriteRenderer.flipX = false;
-        }
-        //========== 왼쪽 이동
-        else if (horizontal < 0)
-        {
+            horizontal = Input.GetAxis("Horizontal");
+            transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
             animater.SetInteger("AnimState", 1);
             spriteRenderer.flipX = true;
+        }
+        else if (Input.GetKey(Key_Right) && !isAttack)
+        {
+            horizontal = Input.GetAxis("Horizontal");
+            transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
+            animater.SetInteger("AnimState", 1);
+            spriteRenderer.flipX = false;
         }
         else
         {
@@ -89,6 +95,31 @@ public class MainCharacter : MonoBehaviour
         animater.SetFloat("G_Acceleration", rigid.velocity.y);
     }
 
+    void Attack()
+    {
+        if (Input.GetKeyDown(Key_Attack) && !isAttack && !isFirstAttack && !isJump)
+        {
+            animater.SetTrigger("Attack_1");
+            isAttack = true;
+        }
+        else if (Input.GetKeyDown(Key_Attack) && !isAttack && isFirstAttack && !isJump)
+        {
+            animater.SetTrigger("Attack_2");
+            isAttack = true;
+        }
+    }
+    void FirstAttack()
+    {
+        isFirstAttack = true;
+        isAttack = false;
+    }
+
+    void Attack_End()
+    {
+        isAttack = false;
+        isFirstAttack = false;
+        Debug.Log("Attack End");
+    }
     IEnumerator Update_Coroutine()
     {
 
@@ -96,7 +127,7 @@ public class MainCharacter : MonoBehaviour
         {
             Run();
             Jump();
-
+            Attack();
             yield return null;
         }
     }

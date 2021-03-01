@@ -16,7 +16,6 @@ public class MainCharacter : MonoBehaviour
     public float MoveSpeed; //캐릭터 이동속도
     public float JumpPower; //점프 힘
 
-    float g_Acceleration; //중력 가속도
     float horizontal;   //수평
     float vertical; //수직
     bool isGround;    //땅위에 서있는지 아닌지

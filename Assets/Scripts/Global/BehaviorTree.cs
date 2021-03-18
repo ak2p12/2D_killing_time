@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+//행동트리 (BehaviorTree)
 //기본적으로 모든 태스크는 결과값을 가지고 있다.
 public abstract class Task
 {

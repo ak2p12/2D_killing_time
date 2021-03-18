@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainCharacter : MonoBehaviour
+public class MainCharacter : Unit
 {
     //========== 입력 ==========//
     public KeyCode Key_Left;
@@ -15,7 +15,7 @@ public class MainCharacter : MonoBehaviour
     //========== 캐릭터 정보 ==========//
     public float MoveSpeed; //캐릭터 이동속도
     public float JumpPower; //점프 힘
-
+    public bool LeftorRight; //현재 캐릭터 방향이 왼쪽인지 오른쪽인지
     float horizontal;   //수평
     float vertical; //수직
     bool isGround;    //땅위에 서있는지 아닌지
@@ -30,8 +30,8 @@ public class MainCharacter : MonoBehaviour
     Animator animater;
     Rigidbody2D rigid;
 
-    public BoxCollider2D HeadCollider;
-    public BoxCollider2D FootCollider;
+    public BoxCollider2D HeadCollider; //머리 충돌객체
+    public BoxCollider2D FootCollider; //다리 충돌객체
 
 
 
@@ -53,14 +53,14 @@ public class MainCharacter : MonoBehaviour
             horizontal = Input.GetAxis("Horizontal");
             transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
             animater.SetInteger("AnimState", 1);
-            spriteRenderer.flipX = true;
+            LeftorRight = spriteRenderer.flipX = true;
         }
         else if (Input.GetKey(Key_Right) && !isAttack)
         {
             horizontal = Input.GetAxis("Horizontal");
             transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
             animater.SetInteger("AnimState", 1);
-            spriteRenderer.flipX = false;
+            LeftorRight = spriteRenderer.flipX = false;
         }
         else
         {
@@ -94,7 +94,7 @@ public class MainCharacter : MonoBehaviour
         animater.SetFloat("G_Acceleration", rigid.velocity.y);
     }
 
-    void Attack()
+    void Attack() 
     {
         if (Input.GetKeyDown(Key_Attack) && !isAttack && !isFirstAttack && !isJump)
         {
@@ -107,13 +107,13 @@ public class MainCharacter : MonoBehaviour
             isAttack = true;
         }
     }
-    void FirstAttack()
+    void FirstAttack() //애니메이션에서 함수 호출
     {
         isFirstAttack = true;
         isAttack = false;
     }
 
-    void Attack_End()
+    void Attack_End() //애니메이션에서 함수 호출
     {
         isAttack = false;
         isFirstAttack = false;
@@ -159,5 +159,10 @@ public class MainCharacter : MonoBehaviour
                 animater.SetBool("Ground", isGround);
             }
         }
+    }
+
+    public override bool Hit(float _damege)
+    {
+        return true;
     }
 }

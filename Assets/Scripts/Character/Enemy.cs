@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Unit
 {
     //========== 캐릭터 정보 ==========//
     public float MoveSpeed; //캐릭터 이동속도
@@ -36,5 +36,38 @@ public class Enemy : MonoBehaviour
         {
             yield return null;
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //충돌한 객체가 기본 땅이면서 기본 땅과 충돌한 객체가 발인경우
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")) &&
+            (collision.otherCollider.name == "Foot"))
+        {
+            isGround = true;
+            isJump = false;
+        }
+
+    }
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        //충돌한 객체가 땅이면서 땅과 충돌한 객체가 발인경우
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")) &&
+           (collision.otherCollider.name == "Foot"))
+        {
+            if (!isJump)
+            {
+                isGround = false;
+            }
+        }
+    }
+
+    public override bool Hit(float _damege)
+    {
+        return true;
     }
 }

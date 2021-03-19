@@ -21,9 +21,6 @@ public class Enemy : Unit
     Animator animater;
     Rigidbody2D rigid;
 
-    public BoxCollider2D HeadCollider;
-    public BoxCollider2D FootCollider;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -41,11 +38,10 @@ public class Enemy : Unit
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //충돌한 객체가 기본 땅이면서 기본 땅과 충돌한 객체가 발인경우
-        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")) &&
-            (collision.otherCollider.name == "Foot"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("NormalGround"))
         {
-            isGround = true;
-            isJump = false;
+            //isGround = true;
+            //isJump = false;
         }
 
     }
@@ -56,13 +52,12 @@ public class Enemy : Unit
     private void OnCollisionExit2D(Collision2D collision)
     {
         //충돌한 객체가 땅이면서 땅과 충돌한 객체가 발인경우
-        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")) &&
-           (collision.otherCollider.name == "Foot"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("NormalGround"))
         {
-            if (!isJump)
-            {
-                isGround = false;
-            }
+            //if (!isJump)
+            //{
+            //    isGround = false;
+            //}
         }
     }
 

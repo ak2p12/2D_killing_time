@@ -6,12 +6,18 @@ public class MeleeAttack : MonoBehaviour
 {
     string targetLayerName;
     float survivalTime;
-    public void SetUp(Vector2 _pos , string _targetLayerName)
+    float damage;
+
+    public void SetUp(Vector2 _pos , float _damage,  string _targetLayerName)
     {
         transform.position = new Vector3(_pos.x, _pos.y, 0.0f);
+        damage = _damage;
         targetLayerName = _targetLayerName;
+
         this.gameObject.SetActive(true);
+
         survivalTime = 0.08f;
+        
         StartCoroutine(Update_Coroutine());
     }
 
@@ -20,7 +26,7 @@ public class MeleeAttack : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer(targetLayerName) &&
             (this.gameObject.activeSelf == true))
         {
-            Debug.Log(collision.gameObject.name);
+            collision.gameObject.GetComponent<Unit>().Hit(damage);
         }
     }
     IEnumerator Update_Coroutine()

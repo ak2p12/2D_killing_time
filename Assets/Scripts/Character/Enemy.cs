@@ -7,6 +7,10 @@ public class Enemy : Unit
     //========== 캐릭터 정보 ==========//
     public float MoveSpeed; //캐릭터 이동속도
     public float JumpPower; //점프 힘
+    public float AttackSpeed; //공격속도
+    public float MeleeDamage; //공격력
+    public float MaxHP; //최대 체력
+    public float CurrentHP; //현재 체력
 
     float g_Acceleration; //중력 가속도
     bool isGround;    //땅위에 서있는지 아닌지
@@ -31,6 +35,7 @@ public class Enemy : Unit
     {
         while (true)
         {
+            Debug.Log("Enemy HP : " + CurrentHP.ToString());
             yield return null;
         }
     }
@@ -63,6 +68,9 @@ public class Enemy : Unit
 
     public override bool Hit(float _damege)
     {
+        CurrentHP -= _damege;
+        if (CurrentHP <= 0.0f)
+            CurrentHP = 0.0f;
         return true;
     }
 }

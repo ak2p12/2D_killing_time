@@ -16,14 +16,20 @@ public class MainCharacter : Unit
     public float MoveSpeed; //캐릭터 이동속도
     public float JumpPower; //점프 힘
     public float AttackSpeed; //공격속도
-    public bool LeftorRight; //현재 캐릭터 방향이 왼쪽인지 오른쪽인지
+    public float MeleeDamage; //공격력
+    public float MaxHP; //최대 체력
+    public float CurrentHP; //현재 체력
+
     float horizontal;   //수평
     float vertical; //수직
+
+    bool leftorRight; //현재 캐릭터 방향이 왼쪽인지 오른쪽인지
+
     bool isGround;    //땅위에 서있는지 아닌지
     bool isJump;    //점프 했는지
     bool isFirstAttack;
     bool isAttack;  //공격중인지
-    
+
     SpriteRenderer spriteRenderer;
     Animator animater;
     Rigidbody2D rigid;
@@ -47,14 +53,14 @@ public class MainCharacter : Unit
             horizontal = Input.GetAxis("Horizontal");
             transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
             animater.SetInteger("AnimState", 1);
-            LeftorRight = spriteRenderer.flipX = true;
+            leftorRight = spriteRenderer.flipX = true;
         }
         else if (Input.GetKey(Key_Right) && !isAttack)
         {
             horizontal = Input.GetAxis("Horizontal");
             transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
             animater.SetInteger("AnimState", 1);
-            LeftorRight = spriteRenderer.flipX = false;
+            leftorRight = spriteRenderer.flipX = false;
         }
         else
             animater.SetInteger("AnimState", 0);
@@ -76,19 +82,20 @@ public class MainCharacter : Unit
         //==========================//
     }
 
-    void Attack() 
+    void Attack()
     {
         //========== 공격 ==========//
         if (Input.GetKeyDown(Key_Attack) && !isAttack && !isFirstAttack && !isJump)
         {
             MeleeAttack();
-            animater.SetFloat("AttackSpeed" , 0.5f);
+            animater.SetFloat("AttackSpeed", AttackSpeed);
             animater.SetTrigger("Attack_1");
             isAttack = true;
         }
         else if (Input.GetKeyDown(Key_Attack) && !isAttack && isFirstAttack && !isJump)
         {
             MeleeAttack();
+            animater.SetFloat("AttackSpeed", AttackSpeed);
             animater.SetTrigger("Attack_2");
             isAttack = true;
         }
@@ -104,7 +111,6 @@ public class MainCharacter : Unit
     {
         isAttack = false;
         isFirstAttack = false;
-        Debug.Log("Attack End");
     }
     IEnumerator Update_Coroutine()
     {
@@ -153,9 +159,9 @@ public class MainCharacter : Unit
 
     private void MeleeAttack()
     {
-        if (LeftorRight)
-            MeleeAttackBox.SetUp(new Vector2(transform.position.x - 1f, transform.position.y + 0.8f), "Enemy");
+        if (leftorRight)
+            MeleeAttackBox.SetUp(new Vector2(transform.position.x - 1f, transform.position.y + 0.8f), MeleeDamage, "Enemy");
         else
-            MeleeAttackBox.SetUp(new Vector2(transform.position.x + 1f, transform.position.y + 0.8f), "Enemy");
+            MeleeAttackBox.SetUp(new Vector2(transform.position.x + 1f, transform.position.y + 0.8f), MeleeDamage, "Enemy");
     }
 }

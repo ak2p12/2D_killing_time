@@ -82,7 +82,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.54545456
+  - time: 0.6363636
     functionName: Dodge_End
     data: 
     objectReferenceParameter: {fileID: 11500000, guid: 43ea3282868680f4f925372c12ebd267,

@@ -30,12 +30,13 @@ public class MainCharacter : Unit
     bool leftorRight; //현재 캐릭터 방향이 왼쪽인지 오른쪽인지 구별 전용
     bool isFirstAttack; //첫번째 공격 모션과 두번째 공격모션 구별전용
 
-    bool isGround;    //땅위에 서있는지 아닌지
+    bool isGround;    //땅 위에서 있는지
     bool isJump;    //점프 했는지
     bool isAttack;  //공격 중인지
     bool isDodge; //회피 중인지
+    bool isLanding; //떨어지는 중인지
 
-    
+
     SpriteRenderer spriteRenderer;
     Animator animater;
     Rigidbody2D rigid;
@@ -81,9 +82,16 @@ public class MainCharacter : Unit
             rigid.AddForce(new Vector2(0, JumpPower), ForceMode2D.Impulse);
             isGround = false;
             isJump = true;
+
+            Attack_End();
         }
 
         animater.SetFloat("G_Acceleration", rigid.velocity.y);
+
+        if (rigid.velocity.y < 0.0f)
+            isLanding = true;
+        else
+            isLanding = false;
         //==========================//
     }
     void Attack()
@@ -108,10 +116,16 @@ public class MainCharacter : Unit
     void Action()
     {
         //구르기
-        if (Input.GetKey(Key_Dodge) && !isDodge && isGround)
+        if (Input.GetKeyDown(Key_Dodge) && !isDodge && isGround)
         {
-            animater.SetTrigger("Dodge");
             isDodge = true;
+            if (Input.GetKey(Key_Left))
+                leftorRight = spriteRenderer.flipX = true;
+            else if (Input.GetKey(Key_Right))
+                leftorRight = spriteRenderer.flipX = false;
+
+            animater.SetTrigger("Dodge");
+
         }
 
         //구르기 중
@@ -119,15 +133,20 @@ public class MainCharacter : Unit
         {
             //왼쪽 구르기
             if (leftorRight)
-                transform.position += new Vector3(-1, 0, 0) * (15 * Time.deltaTime);
+                transform.position += new Vector3(-1, 0, 0) * ( DodgeSpeed * Time.deltaTime);
             //오른쪽 구르기
             else
-                transform.position += new Vector3(1, 0, 0) * (15 * Time.deltaTime);
+                transform.position += new Vector3(1, 0, 0) * ( DodgeSpeed * Time.deltaTime);
         }
     }
-    void FirstAttack() //애니메이션에서 함수 호출
+    void FirstAttack_End() //애니메이션에서 함수 호출
     {
         isFirstAttack = true;
+        isAttack = false;
+    }
+    void SecondAttack_End() //애니메이션에서 함수 호출
+    {
+        isFirstAttack = false;
         isAttack = false;
     }
     void Attack_End() //애니메이션에서 함수 호출
@@ -151,6 +170,8 @@ public class MainCharacter : Unit
             Jump();
             Attack();
             Action();
+
+            //Debug.Log(Vector3.Distance(Vector3.zero , transform.position));
             yield return null;
         }
     }
@@ -161,7 +182,10 @@ public class MainCharacter : Unit
         if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")))
         {
             isGround = true;
-            isJump = false;
+
+            if (isLanding)
+                isJump = false;
+
             animater.SetBool("Ground", isGround);
 
             isAttack = false;
@@ -172,6 +196,8 @@ public class MainCharacter : Unit
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")))
+            isGround = true;
 
     }
     private void OnCollisionExit2D(Collision2D collision)
@@ -179,8 +205,8 @@ public class MainCharacter : Unit
         //충돌한 객체가 땅이면서 땅과 충돌한 객체가 발인경우
         if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")))
         {
-                isGround = false;
-                animater.SetBool("Ground", isGround);
+            isGround = false;
+            animater.SetBool("Ground", isGround);
         }
     }
 

@@ -35,7 +35,7 @@ public class Enemy : Unit
     {
         while (true)
         {
-            Debug.Log("Enemy HP : " + CurrentHP.ToString());
+            //Debug.Log("Enemy HP : " + CurrentHP.ToString());
             yield return null;
         }
     }

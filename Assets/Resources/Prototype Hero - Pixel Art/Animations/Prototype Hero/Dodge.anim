@@ -83,9 +83,10 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.54545456
-    functionName: AE_resetDodge
+    functionName: Dodge_End
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 43ea3282868680f4f925372c12ebd267,
+      type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

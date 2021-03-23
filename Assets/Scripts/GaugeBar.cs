@@ -10,6 +10,10 @@ public class GaugeBar : MonoBehaviour
     {
         if (TargetObject.tag == "Player")
         {
+            
+        }
+        else if (TargetObject.tag == "Player")
+        {
 
         }
     }

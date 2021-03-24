@@ -36,7 +36,6 @@ public class MainCam : MonoBehaviour
             mainCam.orthographicSize = SizeMax;
 
         BeforeCamSize = mainCam.orthographicSize;
-        Debug.Log(mainCam.orthographicSize.ToString());
         //mainCam.orthographicSize = Mathf.Lerp(4,10, dist * Time.deltaTime);
 
 

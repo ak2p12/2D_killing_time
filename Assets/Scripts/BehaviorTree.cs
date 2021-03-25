@@ -4,60 +4,60 @@ using UnityEngine;
 
 //행동트리 (BehaviorTree)
 //기본적으로 모든 태스크는 결과값을 가지고 있다.
-public abstract class Task
+public abstract class Node
 {
     protected bool result = false;
-    public abstract bool Result(Unit _unit);
+    public abstract bool Result(Enemy _enemy);
 }
 
 //메인
-public class BehaviorTree : Task
+public class BehaviorTree : Node
 {
-    public Task root;
-    public bool endRoot;
+    Node root;
+    bool endRoot;
 
-    public void Init(Task _task)
+    public void Init(Node _node)
     {
-        root = _task;
+        root = _node;
         endRoot = false;
     }
 
-    public override bool Result(Unit _unit)
+    public override bool Result(Enemy _enemy)
     {
         if (!endRoot)
-            endRoot = root.Result(_unit);
+            endRoot = root.Result(_enemy);
         return endRoot;
     }
 }
 
 //Composite Task
 //실질적인 루프 
-public abstract class Composite : Task
+public abstract class Composite : Node
 {
-    public List<Task> List_childTask = new List<Task>();     //자식 태스크를 담을 리스트
+    protected List<Node> list_ChildNode = new List<Node>();     //자식 태스크를 담을 리스트
 
-    public void AddTask(Task _task)
+    public void AddNode(Node _node)
     {
-        List_childTask.Add(_task);
+        list_ChildNode.Add(_node);
     }
 
-    public List<Task> GetListTask()
+    public List<Node> GetListNode()
     {
-        return List_childTask;
+        return list_ChildNode;
     }
 
-    public abstract override bool Result(Unit _unit);
+    public abstract override bool Result(Enemy _enemy);
 }
 
 //자식 노드중 하나라도 true 반환하면 즉시 true 반환
 //자식 노드중 전부 false 반환하면 false 반환
 public class Selecter : Composite
 {
-    public override bool Result(Unit _unit)
+    public override bool Result(Enemy _enemy)
     {
-        for (int i = 0; i < List_childTask.Count; ++i)
+        for (int i = 0; i < list_ChildNode.Count; ++i)
         {
-            if (true == List_childTask[i].Result(_unit))
+            if (true == list_ChildNode[i].Result(_enemy))
             {
                 return true;
             }
@@ -71,11 +71,11 @@ public class Selecter : Composite
 //자식 노드중 전부 true 반환하면 true 반환
 public class Sequence : Composite
 {
-    public override bool Result(Unit _unit)
+    public override bool Result(Enemy _enemy)
     {
-        for (int i = 0; i < List_childTask.Count; ++i)
+        for (int i = 0; i < list_ChildNode.Count; ++i)
         {
-            if (false == List_childTask[i].Result(_unit))
+            if (false == list_ChildNode[i].Result(_enemy))
             {
                 return false;
             }
@@ -89,11 +89,11 @@ public class Sequence : Composite
 //넣은 순서로 실행
 public class Parallel : Composite
 {
-    public override bool Result(Unit _unit)
+    public override bool Result(Enemy _enemy)
     {
-        for (int i = 0; i < List_childTask.Count; ++i)
+        for (int i = 0; i < list_ChildNode.Count; ++i)
         {
-            List_childTask[i].Result(_unit);
+            list_ChildNode[i].Result(_enemy);
         }
 
         return true;
@@ -104,19 +104,19 @@ public class Parallel : Composite
 //자식노드가 true를 반환하면 true 반환
 //조건에는 성립하지만 자식노드가 false를 반환하면 false 반환
 
-public abstract class Decorator : Task
+public abstract class Decorator : Node
 {
-    protected Task childTask;
-    public abstract void SetTask(Task _task);
-    public abstract bool ChackCondition(Unit _unit);
-    public abstract override bool Result(Unit _unit);
+    protected Node childNode;
+    public abstract void SetNode(Node _node);
+    public abstract bool ChackCondition(Enemy _enemy);
+    public abstract override bool Result(Enemy _enemy);
 }
 
 public abstract class Condition : Decorator
 {
-    public abstract override void SetTask(Task _task);
-    public abstract override bool ChackCondition(Unit _unit);
-    public abstract override bool Result(Unit _unit);
+    public abstract override void SetNode(Node _node);
+    public abstract override bool ChackCondition(Enemy _enemy);
+    public abstract override bool Result(Enemy _enemy);
 }
 
 public abstract class TimeOut : Decorator
@@ -125,19 +125,19 @@ public abstract class TimeOut : Decorator
     protected float currentTime;
     protected float originTime;
 
-    public abstract override void SetTask(Task _task);
+    public abstract override void SetNode(Node _node);
     public abstract void SetTime(float _time);
-    public abstract override bool ChackCondition(Unit _unit);
-    public abstract override bool Result(Unit _unit);
+    public abstract override bool ChackCondition(Enemy _enemy);
+    public abstract override bool Result(Enemy _enemy);
 }
 
-public abstract class ActionTask : Task
+public abstract class ActionNode : Node
 {
     protected bool isStart = false;
-    public abstract void OnStart(Unit _unit);
-    public abstract bool OnUpdate(Unit _unit);
-    public abstract bool OnEnd(Unit _unit);
-    public abstract override bool Result(Unit _unit);
+    public abstract void OnStart(Enemy _enemy);
+    public abstract bool OnUpdate(Enemy _enemy);
+    public abstract bool OnEnd(Enemy _enemy);
+    public abstract override bool Result(Enemy _enemy);
 }
 
 

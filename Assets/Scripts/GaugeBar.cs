@@ -2,13 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-public enum GAUGEBAR
-{
-    NULL,
-    HP,
-    MP,
-    SP
-}
+
 public class GaugeBar : MonoBehaviour
 {
     public GameObject TargetObject; //정보표시할 객체

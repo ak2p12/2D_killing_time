@@ -69,7 +69,7 @@ public class JumpToDrop : MonoBehaviour
         Gizmos.DrawWireSphere(rightUpDiagonal, 0.1f);
         Gizmos.DrawWireSphere(rightUp, 0.1f);
         Gizmos.DrawWireSphere(rightDown, 0.1f);
-
+        //123
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(left, 0.1f);
         Gizmos.DrawWireSphere(leftDownDiagonal, 0.1f);

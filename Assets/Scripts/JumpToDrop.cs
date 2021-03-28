@@ -1,80 +1,123 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-
+//public enum 
 
 public class JumpToDrop : MonoBehaviour
 {
-    BoxCollider2D boxcollider;
-    Vector3 boxColliderMax;
-    Vector3 boxColliderMin;
-    Vector3 boxColliderSize;
+    Vector2 collisionPoint;
+    public DIRECTION direction;
+    float radius;
 
-    Vector3 right;
-    Vector3 rightDownDiagonal;
-    Vector3 rightUpDiagonal;
-    Vector3 rightUp;
-    Vector3 rightDown;
-
-    Vector3 left;
-    Vector3 leftDownDiagonal;
-    Vector3 leftUpDiagonal;
-    Vector3 leftUp;
-    Vector3 leftDown;
-
-    RaycastHit2D rayHit;
-    Ray2D ray;
+    Vector2 upDiagonalDirection;
+    Vector2 downDiagonalDirection;
+    
 
     void Start()
     {
-        boxcollider = GetComponent<BoxCollider2D>();
-        boxColliderMax = boxcollider.bounds.max;
-        boxColliderMin = boxcollider.bounds.min;
-        boxColliderSize = boxcollider.bounds.size;
-
-        right = new Vector3(boxColliderMax.x + 0.1f , boxColliderMax.y - (boxColliderSize.y * 0.5f), 0);
-        rightDownDiagonal = new Vector3(boxColliderMax.x + 0.1f, boxColliderMin.y - 0.1f, 0);
-        rightUpDiagonal = new Vector3(boxColliderMax.x + 0.1f, boxColliderMax.y + 0.1f, 0);
-        rightUp = new Vector3(boxColliderMax.x - (boxColliderSize.x * 0.05f), boxColliderMax.y + 0.1f, 0);
-        rightDown = new Vector3(boxColliderMax.x - (boxColliderSize.x * 0.05f), boxColliderMin.y - 0.1f, 0);
-
-        left = new Vector3(boxColliderMin.x - 0.1f, boxColliderMax.y - (boxColliderSize.y * 0.5f), 0);
-        leftDownDiagonal = new Vector3(boxColliderMin.x - 0.1f, boxColliderMin.y - 0.1f, 0);
-        leftUpDiagonal = new Vector3(boxColliderMin.x - 0.1f, boxColliderMax.y + 0.1f, 0);
-        leftUp = new Vector3(boxColliderMin.x + (boxColliderSize.x * 0.05f), boxColliderMax.y + 0.1f, 0);
-        leftDown = new Vector3(boxColliderMin.x + (boxColliderSize.x * 0.05f), boxColliderMin.y - 0.1f, 0);
+        collisionPoint = Vector2.zero;
+        radius = GetComponent<CircleCollider2D>().radius * 9.425f;
+        if (direction == DIRECTION.LEFT)
+        {
+            //upDiagonalDirection = new Vector2(-1,1);
+            //downDiagonalDirection = new Vector2(-1,-1));
+        }
+        else if (direction == DIRECTION.RIGHT)
+        {
+            upDiagonalDirection = Vector3.Normalize(new Vector3(1, 1, 0));
+            downDiagonalDirection = Vector3.Normalize(new Vector3(1, -1, 0));
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 temp1 = new Vector3(GetComponent<BoxCollider2D>().bounds.max.x + 0.1f, GetComponent<BoxCollider2D>().bounds.min.y - 0.1f, 0.0f);
-        rayHit = Physics2D.Raycast(temp1, Vector3.down , LayerMask.NameToLayer("NormalGround"));
-        if (rayHit.collider != null)
+        if (direction == DIRECTION.LEFT)
         {
-            //Debug.Log(transform.position.ToString());
-            //Debug.Log(rayHit.collider.ToString());
+            if (collisionPoint != Vector2.zero)
+            {
+               
+                //Mathf.Cos
+            }
+        }//
+        else if (direction == DIRECTION.RIGHT)
+        {
+            if (collisionPoint != Vector2.zero)
+            {
+                Vector2 pos = new Vector2(transform.position.x, transform.position.y);
+                float a1 = Vector2.Dot(Vector2.up , Vector2.right);
+                float a2 = Vector2.Dot(Vector2.up, (collisionPoint - pos).normalized );
+                a1 = Mathf.Acos(a1); // 90
+                a2 = Mathf.Acos(a2);
+
+                a1 *= 180.0f / Mathf.PI;
+                a2 *= 180.0f / Mathf.PI;
+
+                Debug.Log("a1 : " + a1.ToString());
+                Debug.Log("a2 : " + a2.ToString());
+            }
+
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (GetComponentInParent<BoxCollider2D>().name != collision.gameObject.name &&
+            LayerMask.NameToLayer("NormalGround") == collision.gameObject.layer)
+        {
+            collisionPoint = collision.ClosestPoint(transform.position);
+            //Debug.Log(collisionPoint.ToString());
         }
 
-        Debug.Log(boxColliderMax.ToString());
-
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        //if (GetComponentInParent<BoxCollider2D>().name != collision.gameObject.name &&
+        //    LayerMask.NameToLayer("NormalGround") == collision.gameObject.layer)
+        //{
+        //    collisionPoint = collision.ClosestPoint(transform.position);
+        //    //Debug.Log(collisionPoint.ToString());//
+        //}
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(right, 0.1f) ;
-        Gizmos.DrawRay(right , Vector3.right * 2.0f);
-        Gizmos.DrawWireSphere(rightDownDiagonal, 0.1f);
-        Gizmos.DrawWireSphere(rightUpDiagonal, 0.1f);
-        Gizmos.DrawWireSphere(rightUp, 0.1f);
-        Gizmos.DrawWireSphere(rightDown, 0.1f);
-        //123
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(left, 0.1f);
-        Gizmos.DrawWireSphere(leftDownDiagonal, 0.1f);
-        Gizmos.DrawWireSphere(leftUpDiagonal, 0.1f);
-        Gizmos.DrawWireSphere(leftUp, 0.1f);
-        Gizmos.DrawWireSphere(leftDown, 0.1f);
+        Gizmos.color = Color.white;
+        if (collisionPoint != Vector2.zero)
+            Gizmos.DrawLine(transform.position , new Vector3(collisionPoint.x, collisionPoint.y , 0));
+
+        float a1 = Vector2.Dot(Vector2.up, Vector2.right);
+        float a2 = Vector2.Dot(Vector2.up, (collisionPoint - new Vector2(transform.position.x, transform.position.y)).normalized);
+        a1 = Mathf.Acos(a1); // 90
+        a2 = Mathf.Acos(a2);
+
+        a1 *= 180.0f / Mathf.PI;
+        a2 *= 180.0f / Mathf.PI;
+
+        //Debug.Log("a1 : " + a1.ToString());
+       //Debug.Log("a2 : " + a2.ToString());
+
+        //Vector3 temp = new Vector3(collisionPoint.x, collisionPoint.y, 0) - transform.position;
+        //float dot2 = Vector3.Dot(Vector3.right, temp.normalized) * (180 / Mathf.PI);
+
+        if (a1 < a2)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3.up * radius));
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3.right * radius));
+          
+        }
+        else
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3.up * radius));
+            Gizmos.DrawLine(transform.position, transform.position + (Vector3.right * radius));
+        }
+
+        //Gizmos.color = Color.green;
+        //Gizmos.DrawLine(transform.position, transform.position + (Vector3.right * radius));
+        //Gizmos.DrawLine(transform.position, transform.position + (Vector3.up * radius));
     }
+
+    //
 }

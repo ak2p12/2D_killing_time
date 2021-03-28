@@ -6,3 +6,11 @@ public enum GAUGEBAR
     MP,
     SP
 }
+
+public enum DIRECTION
+{
+    NULL,
+    LEFT,
+    RIGHT,
+}
+

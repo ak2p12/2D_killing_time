@@ -14,6 +14,21 @@ public class Enemy : Unit
 
     public float DestroyTime; //소멸 시간
 
+    //============== AI ==============//
+    [HideInInspector] public MainCharacter target;
+    [HideInInspector] public bool isTrace_Left; //왼쪽으로 추격
+    [HideInInspector] public bool isTrace_Right;//오른쪽으로 추격
+
+    
+
+    BehaviorTree bt; //메인루프
+    Sequence sequene_1; //하나라도 false 면 false 반환
+    Condition_IsDead condition_IsDead; //사망 유무 검사 
+    Action_Dead action_Dead; //사망 행동 실행
+
+    [HideInInspector] public bool isSetPos;//오른쪽으로 추격
+    //================================//
+
     SpriteRenderer spriteRenderer;
     Animator animator;
 
@@ -26,7 +41,7 @@ public class Enemy : Unit
         get { return spriteRenderer; }
     }
 
-    bool isRun; //움직이고 있는지
+    [HideInInspector] public bool isRun; //움직이고 있는지
     bool isDead;
 
     public bool Dead
@@ -34,19 +49,18 @@ public class Enemy : Unit
         get { return isDead; }
     }
 
-    BehaviorTree BT; //메인루프
-    Sequence SQ_1; //하나라도 false 면 false 반환
-    Action_Dead action_Dead;
-    // Start is called before the first frame update
+    
+
     void Start()
     {
-        BT = new BehaviorTree();
-        SQ_1 = new Sequence();
-
+        bt = new BehaviorTree();
+        sequene_1 = new Sequence();
+        condition_IsDead = new Condition_IsDead();
         action_Dead = new Action_Dead();
 
-        SQ_1.AddNode(action_Dead);
-        BT.Init(SQ_1);
+        condition_IsDead.SetNode(action_Dead);
+        sequene_1.AddNode(condition_IsDead);
+        bt.Init(sequene_1);
 
 
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -59,15 +73,12 @@ public class Enemy : Unit
     {
         while (true)
         {   
-            if (!BT.Result(this))
+            if (!bt.Result(this))
             {
                 //AI 종료
             }
-            //isRun = true;
-            //animator.SetBool("Run" , isRun);
-            //transform.position += Vector3.right * (MoveSpeed * Time.deltaTime);
-            //spriteRenderer.flipX = false;
-            //Debug.Log(spriteRenderer.color.linear.ToString());
+
+            
 
             yield return null;
         }
@@ -75,7 +86,14 @@ public class Enemy : Unit
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            collision.gameObject.GetComponent<Ground>().DateUpdate(this);
+            if (isTrace_Left)
+                Debug.Log("왼쪽추격");
+            else if (isTrace_Right)
+                Debug.Log("오른쪽 추격");
+        }
 
     }
     private void OnCollisionStay2D(Collision2D collision)
@@ -96,19 +114,101 @@ public class Enemy : Unit
     }
 }
 
+//사망 판별
+public class Condition_IsDead : Condition
+{
+    public override bool ChackCondition(Enemy _enemy)
+    {
+        if (_enemy.Dead)
+            return true;
+
+        return false;
+    }
+
+    public override bool Result(Enemy _enemy)
+    {
+        if (ChackCondition(_enemy))
+        {
+            if (childNode != null && childNode.Result(_enemy))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override void SetNode(Node _node)
+    {
+        childNode = _node;
+    }
+}
+
+//시간 
+public class TimeDelay : TimeOut
+{
+    public override bool ChackCondition(Enemy _enemy)
+    {
+        if (!isStart)
+        {
+            originTime = Time.time;
+            isStart = true;
+            return false;
+        }
+
+        currentTime += Time.time - originTime;
+        originTime = Time.time;
+
+        if (currentTime >= timeDelay)
+            return true;
+
+        return false;
+    }
+
+    public override bool Result(Enemy _enemy)
+    {
+        if (ChackCondition(_enemy))
+        {
+            if (childNode != null && childNode.Result(_enemy))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override void SetNode(Node _node)
+    {
+        childNode = _node;
+    }
+
+    public override void SetTime(float _time)
+    {
+        isStart = false;
+        timeDelay = _time;
+        currentTime = 0.0f;
+        originTime = 0.0f;
+    }
+}
 //적을 찾는 행위
 public class Action_Roaming : ActionNode
 {
     public override void OnStart(Enemy _enemy)
     {
         isStart = true;
+        _enemy.isRun = true;
     }
     public override bool OnUpdate(Enemy _enemy)
     {
+        _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
+        _enemy.transform.position += Vector3.right * (_enemy.MoveSpeed * Time.deltaTime);
+        _enemy.EnemyRenderer.flipX = false;
         return false;
     }
     public override bool OnEnd(Enemy _enemy)
     {
+        _enemy.isRun = false;
+        _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
+        isStart = false;
         return true;
     }
     public override bool Result(Enemy _enemy)
@@ -124,7 +224,6 @@ public class Action_Roaming : ActionNode
         return false;
     }
 }
-
 //사망
 public class Action_Dead : ActionNode
 {

@@ -100,9 +100,6 @@ public class Parallel : Composite
     }
 }
 
-//조건 성립하면 자식노드 실행
-//자식노드가 true를 반환하면 true 반환
-//조건에는 성립하지만 자식노드가 false를 반환하면 false 반환
 
 public abstract class Decorator : Node
 {
@@ -112,6 +109,9 @@ public abstract class Decorator : Node
     public abstract override bool Result(Enemy _enemy);
 }
 
+//조건 성립하면 자식노드 실행
+//자식노드가 true를 반환하면 true 반환
+//조건에는 성립하지만 자식노드가 false를 반환하면 false 반환
 public abstract class Condition : Decorator
 {
     public abstract override void SetNode(Node _node);
@@ -121,6 +121,7 @@ public abstract class Condition : Decorator
 
 public abstract class TimeOut : Decorator
 {
+    protected bool isStart;
     protected float timeDelay;
     protected float currentTime;
     protected float originTime;

@@ -197,7 +197,7 @@ public class MainCharacter : Unit
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //충돌 객체가 땅
-        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")))
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
         {
             isGround = true;
 
@@ -214,14 +214,14 @@ public class MainCharacter : Unit
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")))
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
             isGround = true;
 
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
         //충돌한 객체가 땅이면서 땅과 충돌한 객체가 발인경우
-        if ((collision.gameObject.layer == LayerMask.NameToLayer("NormalGround")))
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
         {
             isGround = false;
             animator.SetBool("Ground", isGround);

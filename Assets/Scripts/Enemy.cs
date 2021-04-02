@@ -19,14 +19,14 @@ public class Enemy : Unit
     [HideInInspector] public bool isTrace_Left; //왼쪽으로 추격
     [HideInInspector] public bool isTrace_Right;//오른쪽으로 추격
 
-    
+    [HideInInspector] public bool isRoaming; //돌아다니는지
 
     BehaviorTree bt; //메인루프
     Sequence sequene_1; //하나라도 false 면 false 반환
     Condition_IsDead condition_IsDead; //사망 유무 검사 
     Action_Dead action_Dead; //사망 행동 실행
 
-    [HideInInspector] public bool isSetPos;//오른쪽으로 추격
+    
     //================================//
 
     SpriteRenderer spriteRenderer;
@@ -150,8 +150,10 @@ public class TimeDelay : TimeOut
     {
         if (!isStart)
         {
-            originTime = Time.time;
             isStart = true;
+            originTime = Time.time;
+            currentTime = 0.0f;
+            originTime = 0.0f;
             return false;
         }
 
@@ -189,6 +191,7 @@ public class TimeDelay : TimeOut
         originTime = 0.0f;
     }
 }
+
 //적을 찾는 행위
 public class Action_Roaming : ActionNode
 {
@@ -224,6 +227,7 @@ public class Action_Roaming : ActionNode
         return false;
     }
 }
+
 //사망
 public class Action_Dead : ActionNode
 {

@@ -1359,7 +1359,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 499577813}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.93, y: 2.51, z: 0}
+  m_LocalPosition: {x: 5.81, y: 5.42, z: 0}
   m_LocalScale: {x: 9.425, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2145645131}
@@ -3313,9 +3313,12 @@ MonoBehaviour:
   MaxHP: 100
   CurrentHP: 100
   DestroyTime: 5
+  isRun: 0
   target: {fileID: 0}
   isTrace_Left: 0
   isTrace_Right: 0
+  isRoaming: 0
+  groundInfo: {fileID: 0}
 --- !u!1 &1569587766
 GameObject:
   m_ObjectHideFlags: 0
@@ -3548,6 +3551,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Player: {fileID: 0}
+  leftJumpToDrop: {fileID: 0}
+  rightJumpToDrop: {fileID: 0}
 --- !u!1 &1595580189
 GameObject:
   m_ObjectHideFlags: 0

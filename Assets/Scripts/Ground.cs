@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Ground : MonoBehaviour
 {
-    JumpToDrop leftJumpToDrop;
-    JumpToDrop rightJumpToDrop;
-    BoxCollider2D box;
     [HideInInspector] public MainCharacter Player;
+
+    [HideInInspector] public JumpToDrop leftJumpToDrop;
+    [HideInInspector] public JumpToDrop rightJumpToDrop;
+    BoxCollider2D box;
 
     Vector3 leftEndPoint;
     Vector3 rightEndPoint;
@@ -38,14 +39,18 @@ public class Ground : MonoBehaviour
     {
         leftEndPoint.Set(box.bounds.min.x, _enemy.transform.position.y, 0.0f);
         rightEndPoint.Set(box.bounds.max.x, _enemy.transform.position.y, 0.0f);
-        float leftdist = Vector3.Distance(leftEndPoint , _enemy.transform.position);
-        float rightdist = Vector3.Distance(rightEndPoint, _enemy.transform.position);
+        float leftDist = Vector3.Distance(leftEndPoint , _enemy.transform.position);
+        float rightDist = Vector3.Distance(rightEndPoint, _enemy.transform.position);
+
+        //타겟을 못 찾았다면
+        if (_enemy.target == null)
+            return;
 
         //타겟이 더 높은곳에 있다면
         if (_enemy.target.transform.position.y > _enemy.transform.position.y)
         {
             //왼쪽이 더 가깝다면
-            if (leftdist < rightdist)
+            if (leftDist < rightDist)
             {
                 //점프가 가능하다면
                 if (leftJumpToDrop.EnemyJump)
@@ -64,7 +69,7 @@ public class Ground : MonoBehaviour
             else
             {
                 //점프가 가능하다면
-                if (leftJumpToDrop.EnemyJump)
+                if (rightJumpToDrop.EnemyJump)
                 {
                     _enemy.isTrace_Left = false;
                     _enemy.isTrace_Right = true;
@@ -80,7 +85,7 @@ public class Ground : MonoBehaviour
         else
         {
             //왼쪽이 더 가깝다면
-            if (leftdist < rightdist)
+            if (leftDist < rightDist)
             {
                 //떨어질 수 있다면
                 if (leftJumpToDrop.EnemyDrop)
@@ -99,7 +104,7 @@ public class Ground : MonoBehaviour
             else
             {
                 //떨어질 수 있다면
-                if (leftJumpToDrop.EnemyDrop)
+                if (rightJumpToDrop.EnemyDrop)
                 {
                     _enemy.isTrace_Left = false;
                     _enemy.isTrace_Right = true;

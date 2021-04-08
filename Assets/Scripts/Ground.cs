@@ -10,10 +10,13 @@ public class Ground : MonoBehaviour
     [HideInInspector] public JumpToDrop rightJumpToDrop;
     BoxCollider2D box;
 
+    public float leftPointDistance;
+    public float rightPointDistance;
+
     Vector3 leftEndPoint;
     Vector3 rightEndPoint;
 
-        //nearest
+        
     void Start()
     {
         Component[] com = GetComponentsInChildren<JumpToDrop>();
@@ -39,8 +42,8 @@ public class Ground : MonoBehaviour
     {
         leftEndPoint.Set(box.bounds.min.x, _enemy.transform.position.y, 0.0f);
         rightEndPoint.Set(box.bounds.max.x, _enemy.transform.position.y, 0.0f);
-        float leftDist = Vector3.Distance(leftEndPoint , _enemy.transform.position);
-        float rightDist = Vector3.Distance(rightEndPoint, _enemy.transform.position);
+        leftPointDistance = Vector3.Distance(leftEndPoint , _enemy.transform.position);
+        rightPointDistance = Vector3.Distance(rightEndPoint, _enemy.transform.position);
 
         //타겟을 못 찾았다면
         if (_enemy.target == null)
@@ -50,7 +53,7 @@ public class Ground : MonoBehaviour
         if (_enemy.target.transform.position.y > _enemy.transform.position.y)
         {
             //왼쪽이 더 가깝다면
-            if (leftDist < rightDist)
+            if (leftPointDistance < rightPointDistance)
             {
                 //점프가 가능하다면
                 if (leftJumpToDrop.EnemyJump)
@@ -85,7 +88,7 @@ public class Ground : MonoBehaviour
         else
         {
             //왼쪽이 더 가깝다면
-            if (leftDist < rightDist)
+            if (leftPointDistance < rightPointDistance)
             {
                 //떨어질 수 있다면
                 if (leftJumpToDrop.EnemyDrop)

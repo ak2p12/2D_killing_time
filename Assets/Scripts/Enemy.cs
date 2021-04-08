@@ -28,6 +28,7 @@ public class Enemy : Unit
     Condition_NotFind condition_NotFind; //타겟 발견 
     Action_Dead action_Dead; //사망 행동 실행
     Action_Roaming action_Roaming;
+
     [HideInInspector] public bool isRoaming; //적 순찰
 
 
@@ -88,13 +89,14 @@ public class Enemy : Unit
     {
         while (true)
         {
-            if (!bt.Result(this))
+            if (groundInfo != null)
             {
-                //AI 종료
+                groundInfo.DateUpdate(this);
+                if (!bt.Result(this))
+                {
+                    //AI 종료
+                }
             }
-
-
-
             yield return null;
         }
     }
@@ -104,7 +106,6 @@ public class Enemy : Unit
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             groundInfo = collision.gameObject.GetComponent<Ground>();
-            groundInfo.DateUpdate(this);
             if (isTrace_Left)
                 Debug.Log("왼쪽추격");
             else if (isTrace_Right)
@@ -264,12 +265,12 @@ public class Action_Roaming : ActionNode
             _enemy.isRun = true;
         }
         //안움직임
-        else
-        {
-            notMoveing = true;
-            timeDelay = 3.0f;
-            _enemy.isRun = false;
-        }
+        //else
+        //{
+        //    notMoveing = true;
+        //    timeDelay = 1.0f;
+        //    _enemy.isRun = false;
+        //}
         originTime = Time.time;
 
 
@@ -279,27 +280,52 @@ public class Action_Roaming : ActionNode
         currentTime += Time.time - originTime;
         originTime = Time.time;
 
+        //대기
         if (notMoveing)
         {
+            if (currentTime >= timeDelay)
+            {
+                notMoveing = false;
+                isStart = false;
+                return false;
+            }
+        }
+        //왼쪽
+        else if (!LEFT_RIGHT)
+        {
+            if (_enemy.groundInfo.leftPointDistance <= 1.0f)
+            {
+                return false;
+            }
+            _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
+            _enemy.transform.position += Vector3.left * (_enemy.MoveSpeed * Time.deltaTime);
+            _enemy.EnemyRenderer.flipX = true;
+
             if (currentTime >= timeDelay)
             {
                 isStart = false;
                 return false;
             }
         }
-        else if (!LEFT_RIGHT)
-        {
-            _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
-            _enemy.transform.position += Vector3.left * (_enemy.MoveSpeed * Time.deltaTime);
-            _enemy.EnemyRenderer.flipX = true;
-        }
+        //오른쪽
         else if (LEFT_RIGHT)
         {
+            if (_enemy.groundInfo.rightPointDistance <= 1.0f)
+            {
+                return false;
+            }
             _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
             _enemy.transform.position += Vector3.right * (_enemy.MoveSpeed * Time.deltaTime);
             _enemy.EnemyRenderer.flipX = false;
-        }
 
+            if (currentTime >= timeDelay)
+            {
+                isStart = false;
+                return false;
+            }
+
+        }
+        
         return false;
     }
     public override bool OnEnd(Enemy _enemy)

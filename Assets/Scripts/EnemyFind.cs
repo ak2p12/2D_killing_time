@@ -12,15 +12,10 @@ public class EnemyFind : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //if (collision.gameObject.layer == LayerMask.NameToLayer("Player") )
-        //{
-        //    Debug.Log(collision.gameObject.name.ToString());
-        //}   
-        Debug.Log("1 + : " + collision.gameObject.name.ToString());
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player") )
+        {
+            enemy.target = collision.gameObject.GetComponent<Transform>();
+        }   
         
-    }
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        Debug.Log("2 + : " + collision.gameObject.name.ToString());
     }
 }

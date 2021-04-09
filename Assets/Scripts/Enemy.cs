@@ -17,7 +17,7 @@ public class Enemy : Unit
     [HideInInspector] public bool isRun; //움직이고 있는지
 
     //============== AI ==============//
-    [HideInInspector] public MainCharacter target;
+    [HideInInspector] public Transform target;
     [HideInInspector] public bool isTrace_Left; //왼쪽으로 추격
     [HideInInspector] public bool isTrace_Right;//오른쪽으로 추격
 

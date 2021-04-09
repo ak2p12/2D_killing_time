@@ -10,12 +10,11 @@ public class Ground : MonoBehaviour
     [HideInInspector] public JumpToDrop rightJumpToDrop;
     BoxCollider2D box;
 
-    public float leftPointDistance;
-    public float rightPointDistance;
+    [HideInInspector] public float leftPointDistance;
+    [HideInInspector] public float rightPointDistance;
 
     Vector3 leftEndPoint;
     Vector3 rightEndPoint;
-
         
     void Start()
     {

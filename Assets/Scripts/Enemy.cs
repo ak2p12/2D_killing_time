@@ -13,7 +13,7 @@ public class Enemy : Unit
     public float CurrentHP; //현재 체력
 
     public float DestroyTime; //소멸 시간
-
+    public float FindRadius; //인식 범위 (반지름)
     [HideInInspector] public bool isRun; //움직이고 있는지
 
     //============== AI ==============//
@@ -33,33 +33,13 @@ public class Enemy : Unit
 
 
     [HideInInspector] public Ground groundInfo;
-    SpriteRenderer spriteRenderer;
-    Animator animator;
+    [HideInInspector] public SpriteRenderer spriteRenderer;
+    [HideInInspector] public Animator animator;
+    [HideInInspector] public Rigidbody2D rigid;
 
-    public Animator EnemyAnimator
-    {
-        get { return animator; }
-    }
-    public SpriteRenderer EnemyRenderer
-    {
-        get { return spriteRenderer; }
-    }
-
-
-
-    bool isDead;
-    bool isFind;
-
-    public bool Dead
-    {
-        get { return isDead; }
-    }
-    public bool Find
-    {
-        get { return isFind; }
-    }
-
-
+    [HideInInspector] public bool isDead;
+    [HideInInspector] public bool isFind;
+    [HideInInspector] public bool isJump;
 
     void Start()
     {
@@ -81,6 +61,7 @@ public class Enemy : Unit
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        rigid = GetComponent<Rigidbody2D>();
 
         StartCoroutine(Update_Coroutine());
     }
@@ -105,11 +86,12 @@ public class Enemy : Unit
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
+            isJump = false;
             groundInfo = collision.gameObject.GetComponent<Ground>();
-            if (isTrace_Left)
-                Debug.Log("왼쪽추격");
-            else if (isTrace_Right)
-                Debug.Log("오른쪽 추격");
+            //if (isTrace_Left)
+            //    Debug.Log("왼쪽추격");
+            //else if (isTrace_Right)
+            //    Debug.Log("오른쪽 추격");
         }
 
     }
@@ -136,7 +118,7 @@ public class Condition_IsDead : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
     {
-        if (_enemy.Dead)
+        if (_enemy.isDead)
             return true;
 
         return false;
@@ -164,7 +146,7 @@ public class Condition_NotFind : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
     {
-        if (!_enemy.Find)
+        if (!_enemy.isFind)
             return true;
 
         return false;
@@ -249,10 +231,12 @@ public class Action_Roaming : ActionNode
         currentTime = originTime = 0.0f;
         isStart = true;
 
-        int random = Random.Range(0, 10);
+        int random = Random.Range(0, 6);
         //왼쪽
         if (random >= 0 && random <= 2)
         {
+            //Debug.Log("왼쪽으로 이동");
+            
             LEFT_RIGHT = false;
             timeDelay = Random.Range(1.0f, 3.0f);
             _enemy.isRun = true;
@@ -260,6 +244,7 @@ public class Action_Roaming : ActionNode
         //오른쪽
         else if (random >= 3 && random <= 5)
         {
+            //Debug.Log("오른쪽으로 이동");
             LEFT_RIGHT = true;
             timeDelay = Random.Range(1.0f, 3.0f);
             _enemy.isRun = true;
@@ -280,50 +265,74 @@ public class Action_Roaming : ActionNode
         currentTime += Time.time - originTime;
         originTime = Time.time;
 
-        //대기
-        if (notMoveing)
+        if (currentTime >= timeDelay)
         {
-            if (currentTime >= timeDelay)
-            {
-                notMoveing = false;
-                isStart = false;
-                return false;
-            }
+            notMoveing = false;
+            isStart = false;
+            return false;
         }
+
+        //대기z
+        if (notMoveing)
+            return false;
         //왼쪽
         else if (!LEFT_RIGHT)
         {
-            if (_enemy.groundInfo.leftPointDistance <= 1.0f)
-            {
-                return false;
-            }
-            _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
-            _enemy.transform.position += Vector3.left * (_enemy.MoveSpeed * Time.deltaTime);
-            _enemy.EnemyRenderer.flipX = true;
+            _enemy.animator.SetBool("Run", _enemy.isRun);
+            
+            _enemy.spriteRenderer.flipX = true;
 
-            if (currentTime >= timeDelay)
+            //점프할 때 이동속도 증가
+            if (_enemy.isJump)
+                _enemy.transform.position += Vector3.left * ( (_enemy.MoveSpeed * 2.0f) * Time.deltaTime);
+            else
+                _enemy.transform.position += Vector3.left * ( _enemy.MoveSpeed * Time.deltaTime);
+
+            if (_enemy.groundInfo.leftPointDistance <= 0.9f)
             {
-                isStart = false;
+                if (_enemy.groundInfo.leftJumpToDrop.EnemyJump && !_enemy.isJump)
+                {
+                    timeDelay += 2.0f;
+                    _enemy.isJump = true;
+                    _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                }
+                else if (!_enemy.groundInfo.leftJumpToDrop.EnemyDrop && !_enemy.isJump)
+                {
+                    timeDelay += 2.0f;
+                    LEFT_RIGHT = !LEFT_RIGHT;
+                }
+
                 return false;
             }
         }
         //오른쪽
         else if (LEFT_RIGHT)
         {
-            if (_enemy.groundInfo.rightPointDistance <= 1.0f)
+            _enemy.animator.SetBool("Run", _enemy.isRun);
+            _enemy.spriteRenderer.flipX = false;
+
+            if (_enemy.isJump)
+                _enemy.transform.position += Vector3.right * ( (_enemy.MoveSpeed * 2.0f) * Time.deltaTime);
+            else
+                _enemy.transform.position += Vector3.right * ( _enemy.MoveSpeed * Time.deltaTime);
+
+            //점프할 때 이동속도 증가
+            if (_enemy.groundInfo.rightPointDistance <= 0.9f)
             {
+                if (_enemy.groundInfo.rightJumpToDrop.EnemyJump && !_enemy.isJump)
+                {
+                    timeDelay += 2.0f;
+                    _enemy.isJump = true;
+                    _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                }
+                else if (!_enemy.groundInfo.rightJumpToDrop.EnemyDrop && !_enemy.isJump)
+                {
+                    timeDelay += 2.0f;
+                    LEFT_RIGHT = !LEFT_RIGHT;
+                }
+
                 return false;
             }
-            _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
-            _enemy.transform.position += Vector3.right * (_enemy.MoveSpeed * Time.deltaTime);
-            _enemy.EnemyRenderer.flipX = false;
-
-            if (currentTime >= timeDelay)
-            {
-                isStart = false;
-                return false;
-            }
-
         }
         
         return false;
@@ -331,7 +340,7 @@ public class Action_Roaming : ActionNode
     public override bool OnEnd(Enemy _enemy)
     {
         _enemy.isRun = false;
-        _enemy.EnemyAnimator.SetBool("Run", _enemy.isRun);
+        _enemy.animator.SetBool("Run", _enemy.isRun);
         isStart = false;
         return true;
     }
@@ -357,7 +366,7 @@ public class Action_Dead : ActionNode
     {
         isStart = true;
         currentTime = _enemy.DestroyTime;
-        _enemy.EnemyAnimator.SetTrigger("Dead");
+        _enemy.animator.SetTrigger("Dead");
         originTime = Time.time;
     }
     public override bool OnUpdate(Enemy _enemy)
@@ -370,7 +379,7 @@ public class Action_Dead : ActionNode
 
         //현재 프레임 시간을 예전 프레임 시간으로 대입
         originTime = Time.time;
-        _enemy.EnemyRenderer.color = new Color(1, 1, 1, currentTime);
+        _enemy.spriteRenderer.color = new Color(1, 1, 1, currentTime);
 
         if (currentTime <= 0.0f)
             return true;
@@ -379,7 +388,7 @@ public class Action_Dead : ActionNode
     }
     public override bool OnEnd(Enemy _enemy)
     {
-        _enemy.EnemyRenderer.color = new Color(1, 1, 1, 0);
+        _enemy.spriteRenderer.color = new Color(1, 1, 1, 0);
         originTime = 0.0f;
         currentTime = 0.0f;
         isStart = true;

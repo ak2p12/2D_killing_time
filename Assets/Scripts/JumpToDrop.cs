@@ -6,9 +6,10 @@ using UnityEngine;
 
 public class JumpToDrop : MonoBehaviour
 {
+    Transform parentTransform;
     Vector2 collisionPoint;
     public DIRECTION direction;
-    //float radius;
+    float radius;
 
     Vector2 direction_1;
     Vector2 direction_2;
@@ -25,7 +26,11 @@ public class JumpToDrop : MonoBehaviour
     void Start()
     {
         collisionPoint = Vector2.zero;
-        //radius = GetComponent<CircleCollider2D>().radius * 9.425f;
+        parentTransform = transform.parent.GetComponent<Transform>();
+        float scale = (parentTransform.localScale.x > parentTransform.localScale.y) ?
+            parentTransform.localScale.x : parentTransform.localScale.y;
+
+        radius = GetComponent<CircleCollider2D>().radius * scale;
 
         Quaternion angle = Quaternion.Euler(0, 0, AngleZ_1);
         direction_1 = (angle * Vector3.up).normalized;
@@ -130,6 +135,106 @@ public class JumpToDrop : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
+        float dot_1 = Vector2.Dot(direction_1, direction_2);
+        float dot_2 = Vector2.Dot(direction_1, (collisionPoint - (Vector2)transform.position).normalized);
+        dot_1 = Mathf.Acos(dot_1);
+        dot_2 = Mathf.Acos(dot_2);
+        dot_1 *= 180.0f / Mathf.PI;
+        dot_2 *= 180.0f / Mathf.PI;
+
+        float dot_3 = Vector2.Dot(direction_2, direction_3);
+        float dot_4 = Vector2.Dot(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+        dot_3 = Mathf.Acos(dot_3);
+        dot_4 = Mathf.Acos(dot_4);
+        dot_3 *= 180.0f / Mathf.PI;
+        dot_4 *= 180.0f / Mathf.PI;
+
+        Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint - (Vector2)transform.position).normalized);
+        Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+
+        Gizmos.color = Color.white;
+        Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+        Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+        Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+
+        if (direction == DIRECTION.LEFT)
+        {
+            if (cross_1.z > 0.0f)
+            {
+                if (dot_1 > dot_2)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                }
+                else
+                {
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                }
+            }
+
+            if (cross_2.z > 0.0f)
+            {
+                if (dot_3 > dot_4)
+                {
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                    Gizmos.color = Color.white;
+                }
+                else
+                {
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                }
+            }
+            
+        }
+        else if (direction == DIRECTION.RIGHT)
+        {
+            if (cross_1.z < 0.0f)
+            {
+                if (dot_1 > dot_2)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                }
+                else
+                {
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                }
+            }
+
+            if (cross_2.z < 0.0f)
+            {
+                if (dot_3 > dot_4)
+                {
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                    Gizmos.color = Color.white;
+                }
+                else
+                {
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_2 * radius));
+                    Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
+                }
+            }
+        }
+
         //Vector3 dir_1 = direction_1;
         //Vector3 dir_2 = direction_2;
         //Vector3 dir_3 = direction_3;
@@ -171,10 +276,10 @@ public class JumpToDrop : MonoBehaviour
         //    else
         //        Handles.color = Color.green;
         //}
-        
-           
 
-        
+
+
+
 
         //Gizmos.DrawLine(transform.position, (transform.position + dir_1 * radius) );
         //Gizmos.DrawLine(transform.position, (transform.position + dir_2 * radius) );
@@ -183,8 +288,8 @@ public class JumpToDrop : MonoBehaviour
         //Handles.DrawSolidArc(transform.position, Vector3.forward, direction_1, AngleZ_2 - AngleZ_1, radius);
         //Handles.DrawSolidArc(transform.position, Vector3.forward, direction_2, AngleZ_3 - AngleZ_2, radius);
 
-        
-        
+
+
     }
 
     //

@@ -7,10 +7,11 @@ using UnityEngine;
 public class JumpToDrop : MonoBehaviour
 {
     Transform parentTransform;
-    Vector2 collisionPoint;
+    Vector2 collisionPoint_1;
+    Vector2 collisionPoint_2;
     public DIRECTION direction;
     float radius;
-
+    int count;
     Vector2 direction_1;
     Vector2 direction_2;
     Vector2 direction_3;
@@ -25,7 +26,8 @@ public class JumpToDrop : MonoBehaviour
 
     void Start()
     {
-        collisionPoint = Vector2.zero;
+        collisionPoint_1 = new Vector2();
+        collisionPoint_2 = new Vector2();
         parentTransform = transform.parent.GetComponent<Transform>();
         float scale = (parentTransform.localScale.x > parentTransform.localScale.y) ?
             parentTransform.localScale.x : parentTransform.localScale.y;
@@ -46,111 +48,178 @@ public class JumpToDrop : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (direction == DIRECTION.LEFT)
         {
-            if (collisionPoint != Vector2.zero)
+            if (collisionPoint_1 != Vector2.zero)
             {
                 float dot_1 = Vector2.Dot(direction_1, direction_2);
-                float dot_2 = Vector2.Dot(direction_1, (collisionPoint - (Vector2)transform.position).normalized);
+                float dot_2 = Vector2.Dot(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized);
                 dot_1 = Mathf.Acos(dot_1);
                 dot_2 = Mathf.Acos(dot_2);
                 dot_1 *= 180.0f / Mathf.PI;
                 dot_2 *= 180.0f / Mathf.PI;
 
                 float dot_3 = Vector2.Dot(direction_2, direction_3);
-                float dot_4 = Vector2.Dot(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+                float dot_4 = Vector2.Dot(direction_2, (collisionPoint_1 - (Vector2)transform.position).normalized);
                 dot_3 = Mathf.Acos(dot_3);
                 dot_4 = Mathf.Acos(dot_4);
                 dot_3 *= 180.0f / Mathf.PI;
                 dot_4 *= 180.0f / Mathf.PI;
 
-                Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint - (Vector2)transform.position).normalized);
-                Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+                Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized);
+                Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint_1 - (Vector2)transform.position).normalized);
 
                 if (cross_1.z > 0.0f)
                 {
                     if (dot_1 > dot_2)
                         EnemyJump = true;
-                    else
-                        EnemyJump = false;
                 }
 
                 if (cross_2.z > 0.0f)
                 {
                     if (dot_3 > dot_4)
                         EnemyDrop = true;
-                    else
-                        EnemyDrop = false;
                 }
             }
-        }
-        else if (direction == DIRECTION.RIGHT)
-        {
-            if (collisionPoint != Vector2.zero)
+            else if (collisionPoint_2 != Vector2.zero)
             {
                 float dot_1 = Vector2.Dot(direction_1, direction_2);
-                float dot_2 = Vector2.Dot(direction_1, (collisionPoint - (Vector2)transform.position).normalized );
+                float dot_2 = Vector2.Dot(direction_1, (collisionPoint_2 - (Vector2)transform.position).normalized);
                 dot_1 = Mathf.Acos(dot_1);
                 dot_2 = Mathf.Acos(dot_2);
                 dot_1 *= 180.0f / Mathf.PI;
                 dot_2 *= 180.0f / Mathf.PI;
 
                 float dot_3 = Vector2.Dot(direction_2, direction_3);
-                float dot_4 = Vector2.Dot(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+                float dot_4 = Vector2.Dot(direction_2, (collisionPoint_2 - (Vector2)transform.position).normalized);
                 dot_3 = Mathf.Acos(dot_3);
                 dot_4 = Mathf.Acos(dot_4);
                 dot_3 *= 180.0f / Mathf.PI;
                 dot_4 *= 180.0f / Mathf.PI;
 
-                Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint - (Vector2)transform.position).normalized);
-                Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+                Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint_2 - (Vector2)transform.position).normalized);
+                Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint_2 - (Vector2)transform.position).normalized);
+
+                if (cross_1.z > 0.0f)
+                {
+                    if (dot_1 > dot_2)
+                        EnemyJump = true;
+                }
+
+                if (cross_2.z > 0.0f)
+                {
+                    if (dot_3 > dot_4)
+                        EnemyDrop = true;
+                }
+            }
+        }
+        else if (direction == DIRECTION.RIGHT)
+        {
+            if (collisionPoint_1 != Vector2.zero)
+            {
+                float dot_1 = Vector2.Dot(direction_1, direction_2);
+                float dot_2 = Vector2.Dot(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized );
+                dot_1 = Mathf.Acos(dot_1);
+                dot_2 = Mathf.Acos(dot_2);
+                dot_1 *= 180.0f / Mathf.PI;
+                dot_2 *= 180.0f / Mathf.PI;
+
+                float dot_3 = Vector2.Dot(direction_2, direction_3);
+                float dot_4 = Vector2.Dot(direction_2, (collisionPoint_1 - (Vector2)transform.position).normalized);
+                dot_3 = Mathf.Acos(dot_3);
+                dot_4 = Mathf.Acos(dot_4);
+                dot_3 *= 180.0f / Mathf.PI;
+                dot_4 *= 180.0f / Mathf.PI;
+
+                Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized);
+                Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint_1 - (Vector2)transform.position).normalized);
 
                     if (cross_1.z < 0.0f)
                     {
                         if (dot_1 > dot_2)
                             EnemyJump = true;
-                        else
-                            EnemyJump = false;
                     }
-
+                    //
                     if (cross_2.z < 0.0f)
                     {
                         if (dot_3 > dot_4)
                             EnemyDrop = true;
-                        else
-                            EnemyDrop = false;
                     }
+            }
+            else if (collisionPoint_2 != Vector2.zero)
+            {
+                float dot_1 = Vector2.Dot(direction_1, direction_2);
+                float dot_2 = Vector2.Dot(direction_1, (collisionPoint_2 - (Vector2)transform.position).normalized);
+                dot_1 = Mathf.Acos(dot_1);
+                dot_2 = Mathf.Acos(dot_2);
+                dot_1 *= 180.0f / Mathf.PI;
+                dot_2 *= 180.0f / Mathf.PI;
+
+                float dot_3 = Vector2.Dot(direction_2, direction_3);
+                float dot_4 = Vector2.Dot(direction_2, (collisionPoint_2 - (Vector2)transform.position).normalized);
+                dot_3 = Mathf.Acos(dot_3);
+                dot_4 = Mathf.Acos(dot_4);
+                dot_3 *= 180.0f / Mathf.PI;
+                dot_4 *= 180.0f / Mathf.PI;
+
+                Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint_2 - (Vector2)transform.position).normalized);
+                Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint_2 - (Vector2)transform.position).normalized);
+
+                if (cross_1.z < 0.0f)
+                {
+                    if (dot_1 > dot_2)//
+                        EnemyJump = true;
+                }
+
+                if (cross_2.z < 0.0f)
+                {
+                    if (dot_3 > dot_4)
+                        EnemyDrop = true;
+                }
             }
 
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (transform.parent.gameObject.name == "Ground_3")
+        {
+            int i = 0;
+        }
         if (GetComponentInParent<BoxCollider2D>().name != collision.gameObject.name &&
             LayerMask.NameToLayer("Ground") == collision.gameObject.layer)
         {
-            collisionPoint = collision.ClosestPoint(transform.position);
-        }
+            if (collision.gameObject.name == "Ground_Lowest")
+            {
+                EnemyDrop = true;
+                return;
+            }
 
+            if (collisionPoint_1 == Vector2.zero)
+                collisionPoint_1 = collision.ClosestPoint(transform.position);
+            else if (collisionPoint_2 == Vector2.zero)
+                collisionPoint_2 = collision.ClosestPoint(transform.position);
+        }
     }
     private void OnDrawGizmos()
     {
         float dot_1 = Vector2.Dot(direction_1, direction_2);
-        float dot_2 = Vector2.Dot(direction_1, (collisionPoint - (Vector2)transform.position).normalized);
+        float dot_2 = Vector2.Dot(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized);
         dot_1 = Mathf.Acos(dot_1);
         dot_2 = Mathf.Acos(dot_2);
         dot_1 *= 180.0f / Mathf.PI;
         dot_2 *= 180.0f / Mathf.PI;
 
         float dot_3 = Vector2.Dot(direction_2, direction_3);
-        float dot_4 = Vector2.Dot(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+        float dot_4 = Vector2.Dot(direction_2, (collisionPoint_1 - (Vector2)transform.position).normalized);
         dot_3 = Mathf.Acos(dot_3);
         dot_4 = Mathf.Acos(dot_4);
         dot_3 *= 180.0f / Mathf.PI;
         dot_4 *= 180.0f / Mathf.PI;
 
-        Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint - (Vector2)transform.position).normalized);
-        Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint - (Vector2)transform.position).normalized);
+        Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized);
+        Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint_1 - (Vector2)transform.position).normalized);
 
         Gizmos.color = Color.white;
         Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_1 * radius));
@@ -194,7 +263,7 @@ public class JumpToDrop : MonoBehaviour
                     Gizmos.DrawLine(transform.position, (transform.position + (Vector3)direction_3 * radius));
                 }
             }
-            
+
         }
         else if (direction == DIRECTION.RIGHT)
         {
@@ -234,48 +303,6 @@ public class JumpToDrop : MonoBehaviour
                 }
             }
         }
-
-        //Vector3 dir_1 = direction_1;
-        //Vector3 dir_2 = direction_2;
-        //Vector3 dir_3 = direction_3;
-
-        //Gizmos.color = Color.white;
-        //if (collisionPoint != Vector2.zero)
-        //    Gizmos.DrawLine(transform.position , new Vector3(collisionPoint.x, collisionPoint.y , 0));
-
-        //float a1 = Vector2.Dot(direction_1, direction_2);
-        //float a2 = Vector2.Dot(direction_1, (collisionPoint - new Vector2(transform.position.x, transform.position.y)).normalized);
-        //a1 = Mathf.Acos(a1); // 90
-        //a2 = Mathf.Acos(a2);
-
-        //a1 *= 180.0f / Mathf.PI;
-        //a2 *= 180.0f / Mathf.PI;
-        //Vector3 temp = Vector3.Cross(direction_1, (collisionPoint - new Vector2(transform.position.x, transform.position.y)).normalized);
-
-        //if (direction == DIRECTION.RIGHT)
-        //{
-        //    if (temp.z < 0.0f)
-        //    {
-        //        if (a1 > a2)
-        //            Handles.color = Color.red;
-        //        else
-        //            Handles.color = Color.green;
-        //    }
-        //    else
-        //        Handles.color = Color.green;
-        //}
-        //else
-        //{
-        //    if (temp.z > 0.0f)
-        //    {
-        //        if (a1 > a2)
-        //            Handles.color = Color.red;
-        //        else
-        //            Handles.color = Color.green;
-        //    }
-        //    else
-        //        Handles.color = Color.green;
-        //}
 
 
 

@@ -111,6 +111,14 @@ public class Enemy : Unit
             CurrentHP = 0.0f;
         return true;
     }
+
+    private void OnDrawGizmos()
+    {
+        if (isFind)
+        {
+            spriteRenderer.color = Color.red;
+        }
+    }
 }
 
 //사망 판별
@@ -231,7 +239,7 @@ public class Action_Roaming : ActionNode
         currentTime = originTime = 0.0f;
         isStart = true;
 
-        int random = Random.Range(0, 6);
+        int random = Random.Range(0,10);
         //왼쪽
         if (random >= 0 && random <= 2)
         {
@@ -250,18 +258,23 @@ public class Action_Roaming : ActionNode
             _enemy.isRun = true;
         }
         //안움직임
-        //else
-        //{
-        //    notMoveing = true;
-        //    timeDelay = 1.0f;
-        //    _enemy.isRun = false;
-        //}
+        else
+        {
+            notMoveing = true;
+            timeDelay = 1.0f;
+            _enemy.isRun = false;
+            _enemy.animator.SetBool("Run", _enemy.isRun);
+        }
         originTime = Time.time;
 
 
     }
     public override bool OnUpdate(Enemy _enemy)
     {
+        if (_enemy.isFind)
+        {
+            return true;
+        }
         currentTime += Time.time - originTime;
         originTime = Time.time;
 
@@ -279,7 +292,6 @@ public class Action_Roaming : ActionNode
         else if (!LEFT_RIGHT)
         {
             _enemy.animator.SetBool("Run", _enemy.isRun);
-            
             _enemy.spriteRenderer.flipX = true;
 
             //점프할 때 이동속도 증가
@@ -290,15 +302,31 @@ public class Action_Roaming : ActionNode
 
             if (_enemy.groundInfo.leftPointDistance <= 0.9f)
             {
+                if (_enemy.groundInfo.leftJumpToDrop.EnemyJump &&
+                   _enemy.groundInfo.leftJumpToDrop.EnemyDrop &&
+                   !_enemy.isJump)
+                {
+                    int randomInt = Random.Range(0, 2);
+                    if (randomInt == 0)
+                    {
+                        timeDelay += 1.0f;
+                        _enemy.isJump = true;
+                        _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                    }
+                    else
+                    {
+                        timeDelay += 1.0f;
+                    }
+                }
                 if (_enemy.groundInfo.leftJumpToDrop.EnemyJump && !_enemy.isJump)
                 {
-                    timeDelay += 2.0f;
+                    timeDelay += 1.0f;
                     _enemy.isJump = true;
                     _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
                 }
                 else if (!_enemy.groundInfo.leftJumpToDrop.EnemyDrop && !_enemy.isJump)
                 {
-                    timeDelay += 2.0f;
+                    timeDelay += 1.0f;
                     LEFT_RIGHT = !LEFT_RIGHT;
                 }
 
@@ -319,15 +347,31 @@ public class Action_Roaming : ActionNode
             //점프할 때 이동속도 증가
             if (_enemy.groundInfo.rightPointDistance <= 0.9f)
             {
-                if (_enemy.groundInfo.rightJumpToDrop.EnemyJump && !_enemy.isJump)
+                if (_enemy.groundInfo.rightJumpToDrop.EnemyJump &&
+                    _enemy.groundInfo.rightJumpToDrop.EnemyDrop &&
+                    !_enemy.isJump)
                 {
-                    timeDelay += 2.0f;
+                    int randomInt = Random.Range(0,2);
+                    if (randomInt == 0)
+                    {
+                        timeDelay += 1.0f;
+                        _enemy.isJump = true;
+                        _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                    }
+                    else
+                    {
+                        timeDelay += 1.0f;
+                    }
+                }
+                else if (_enemy.groundInfo.rightJumpToDrop.EnemyJump && !_enemy.isJump)
+                {
+                    timeDelay += 1.0f;
                     _enemy.isJump = true;
                     _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
                 }
                 else if (!_enemy.groundInfo.rightJumpToDrop.EnemyDrop && !_enemy.isJump)
                 {
-                    timeDelay += 2.0f;
+                    timeDelay += 1.0f;
                     LEFT_RIGHT = !LEFT_RIGHT;
                 }
 

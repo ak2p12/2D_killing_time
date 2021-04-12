@@ -23,6 +23,9 @@ public class JumpToDrop : MonoBehaviour
     public bool EnemyJump; //점프 가능 유무
     public bool EnemyDrop; //
 
+    public bool LeftJump;
+    public bool RightJump;
+
 
     void Start()
     {
@@ -48,7 +51,6 @@ public class JumpToDrop : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
         if (direction == DIRECTION.LEFT)
         {
             if (collisionPoint_1 != Vector2.zero)
@@ -119,7 +121,7 @@ public class JumpToDrop : MonoBehaviour
             if (collisionPoint_1 != Vector2.zero)
             {
                 float dot_1 = Vector2.Dot(direction_1, direction_2);
-                float dot_2 = Vector2.Dot(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized );
+                float dot_2 = Vector2.Dot(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized);
                 dot_1 = Mathf.Acos(dot_1);
                 dot_2 = Mathf.Acos(dot_2);
                 dot_1 *= 180.0f / Mathf.PI;
@@ -135,17 +137,17 @@ public class JumpToDrop : MonoBehaviour
                 Vector3 cross_1 = Vector3.Cross(direction_1, (collisionPoint_1 - (Vector2)transform.position).normalized);
                 Vector3 cross_2 = Vector3.Cross(direction_2, (collisionPoint_1 - (Vector2)transform.position).normalized);
 
-                    if (cross_1.z < 0.0f)
-                    {
-                        if (dot_1 > dot_2)
-                            EnemyJump = true;
-                    }
-                    //
-                    if (cross_2.z < 0.0f)
-                    {
-                        if (dot_3 > dot_4)
-                            EnemyDrop = true;
-                    }
+                if (cross_1.z < 0.0f)
+                {
+                    if (dot_1 > dot_2)
+                        EnemyJump = true;
+                }
+                //
+                if (cross_2.z < 0.0f)
+                {
+                    if (dot_3 > dot_4)
+                        EnemyDrop = true;
+                }
             }
             else if (collisionPoint_2 != Vector2.zero)
             {
@@ -183,10 +185,6 @@ public class JumpToDrop : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (transform.parent.gameObject.name == "Ground_3")
-        {
-            int i = 0;
-        }
         if (GetComponentInParent<BoxCollider2D>().name != collision.gameObject.name &&
             LayerMask.NameToLayer("Ground") == collision.gameObject.layer)
         {
@@ -303,20 +301,8 @@ public class JumpToDrop : MonoBehaviour
                 }
             }
         }
-
-
-
-
-
-        //Gizmos.DrawLine(transform.position, (transform.position + dir_1 * radius) );
-        //Gizmos.DrawLine(transform.position, (transform.position + dir_2 * radius) );
-        //Gizmos.DrawLine(transform.position, (transform.position + dir_3 * radius) );
-
         //Handles.DrawSolidArc(transform.position, Vector3.forward, direction_1, AngleZ_2 - AngleZ_1, radius);
         //Handles.DrawSolidArc(transform.position, Vector3.forward, direction_2, AngleZ_3 - AngleZ_2, radius);
-
-
-
     }
 
     //

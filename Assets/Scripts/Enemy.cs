@@ -14,6 +14,10 @@ public class Enemy : Unit
 
     public float DestroyTime; //소멸 시간
     public float FindRadius; //인식 범위 (반지름)
+
+    private int movingRandomCount;
+    private float movingTimeCount;
+
     [HideInInspector] public bool isRun; //움직이고 있는지
 
     //============== AI ==============//
@@ -88,19 +92,7 @@ public class Enemy : Unit
         {
             isJump = false;
             groundInfo = collision.gameObject.GetComponent<Ground>();
-            //if (isTrace_Left)
-            //    Debug.Log("왼쪽추격");
-            //else if (isTrace_Right)
-            //    Debug.Log("오른쪽 추격");
         }
-
-    }
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-
-    }
-    private void OnCollisionExit2D(Collision2D collision)
-    {
 
     }
 
@@ -223,160 +215,247 @@ public class TimeDelay : TimeOut
         originTime = 0.0f;
     }
 }
+
 //적을 찾는 행위
 public class Action_Roaming : ActionNode
 {
-    bool LEFT_RIGHT;
-    bool notMoveing;
+    bool leftMoving;
+    bool rightMoving;
+    bool notMoving;
+    bool notJumping;
+
     float currentTime;
     float originTime;
     float timeDelay;
 
     public override void OnStart(Enemy _enemy)
     {
-        LEFT_RIGHT = notMoveing = false;
-
+        leftMoving = rightMoving = notMoving = notJumping = false;
         currentTime = originTime = 0.0f;
+        _enemy.isJump = false;
         isStart = true;
 
         int random = Random.Range(0,10);
         //왼쪽
         if (random >= 0 && random <= 2)
         {
-            //Debug.Log("왼쪽으로 이동");
-            
-            LEFT_RIGHT = false;
-            timeDelay = Random.Range(1.0f, 3.0f);
+            leftMoving = true;
             _enemy.isRun = true;
+            timeDelay = Random.Range(3.0f, 5.0f);
+            
         }
         //오른쪽
         else if (random >= 3 && random <= 5)
         {
-            //Debug.Log("오른쪽으로 이동");
-            LEFT_RIGHT = true;
-            timeDelay = Random.Range(1.0f, 3.0f);
+            rightMoving = true;
             _enemy.isRun = true;
+            timeDelay = Random.Range(3.0f, 5.0f);
         }
         //안움직임
         else
         {
-            notMoveing = true;
-            timeDelay = 1.0f;
             _enemy.isRun = false;
-            _enemy.animator.SetBool("Run", _enemy.isRun);
+            notMoving = true;
+            timeDelay = 1.0f;
         }
+
         originTime = Time.time;
 
 
     }
     public override bool OnUpdate(Enemy _enemy)
     {
+        //적을 찾으면 종료
         if (_enemy.isFind)
         {
             return true;
         }
+
         currentTime += Time.time - originTime;
         originTime = Time.time;
 
+        //지정된 시간이 되면 종료
         if (currentTime >= timeDelay)
         {
-            notMoveing = false;
             isStart = false;
             return false;
         }
 
-        //대기z
-        if (notMoveing)
-            return false;
-        //왼쪽
-        else if (!LEFT_RIGHT)
+        //대기
+        if (notMoving)
         {
+            _enemy.isRun = false;
+            _enemy.animator.SetBool("Run", _enemy.isRun);
+            return false;
+        }
+            
+        //왼쪽
+        else if (leftMoving)
+        {
+            //점프할 때 이동속도 증가
+            if (_enemy.isJump)
+                _enemy.transform.position += Vector3.left * ((_enemy.MoveSpeed * 2.0f) * Time.deltaTime);
+            else
+                _enemy.transform.position += Vector3.left * (_enemy.MoveSpeed * Time.deltaTime);
+
+            //왼쪽으로 이동
             _enemy.animator.SetBool("Run", _enemy.isRun);
             _enemy.spriteRenderer.flipX = true;
 
-            //점프할 때 이동속도 증가
-            if (_enemy.isJump)
-                _enemy.transform.position += Vector3.left * ( (_enemy.MoveSpeed * 2.0f) * Time.deltaTime);
-            else
-                _enemy.transform.position += Vector3.left * ( _enemy.MoveSpeed * Time.deltaTime);
-
-            if (_enemy.groundInfo.leftPointDistance <= 0.9f)
+            //제일 밑에 있는 땅일 경우
+            if (_enemy.groundInfo.IsLowestGround)
             {
-                if (_enemy.groundInfo.leftJumpToDrop.EnemyJump &&
-                   _enemy.groundInfo.leftJumpToDrop.EnemyDrop &&
-                   !_enemy.isJump)
+                //점프박스와 거리 계산
+                for (int i = 0; i < _enemy.groundInfo.jumpBox.Length; ++i)
                 {
-                    int randomInt = Random.Range(0, 2);
-                    if (randomInt == 0)
+                    Vector3 jumpBoxPos = new Vector3(
+                        _enemy.groundInfo.jumpBox[i].transform.position.x,
+                        _enemy.transform.position.y);
+                    
+                    //점프박스와 거리가 가까울 경우
+                    float dist = Vector3.Distance(jumpBoxPos, _enemy.transform.position); 
+                    if (dist <= 0.9f)
+                    {
+                        //랜덤으로 점프 할지 안할지 결정
+                        int random = Random.Range(0,2);
+
+                        //점프할 경우
+                        if (random == 1 && !_enemy.isJump)
+                        {
+                            if (_enemy.groundInfo.jumpBox[i].RightJump)
+                            {
+                                leftMoving = false;
+                                rightMoving = true;
+                            }
+                            else if (_enemy.groundInfo.jumpBox[i].LeftJump)
+                            {
+                                leftMoving = true;
+                                rightMoving = false;
+                            }
+
+                            timeDelay += 1.0f;
+                            _enemy.isJump = true;
+                            _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (_enemy.groundInfo.leftPointDistance <= 0.9f)
+                {
+                    if (_enemy.groundInfo.leftJumpToDrop.EnemyJump &&
+                       _enemy.groundInfo.leftJumpToDrop.EnemyDrop &&
+                       !_enemy.isJump)
+                    {
+                        int randomJumpToDrop = Random.Range(0, 2);
+                        //0 이면 점프
+                        if (randomJumpToDrop == 0 && !_enemy.isJump)
+                        {
+                            timeDelay += 1.0f;
+                            _enemy.isJump = true;
+                            _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                        }
+                        else
+                        {
+                            timeDelay += 1.0f;
+                        }
+                    }
+                    else if (_enemy.groundInfo.leftJumpToDrop.EnemyJump && !_enemy.isJump)
                     {
                         timeDelay += 1.0f;
                         _enemy.isJump = true;
                         _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
                     }
-                    else
+                    else if (!_enemy.groundInfo.leftJumpToDrop.EnemyDrop && !_enemy.isJump)
                     {
                         timeDelay += 1.0f;
+                        leftMoving = false;
+                        rightMoving = true;
                     }
-                }
-                if (_enemy.groundInfo.leftJumpToDrop.EnemyJump && !_enemy.isJump)
-                {
-                    timeDelay += 1.0f;
-                    _enemy.isJump = true;
-                    _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
-                }
-                else if (!_enemy.groundInfo.leftJumpToDrop.EnemyDrop && !_enemy.isJump)
-                {
-                    timeDelay += 1.0f;
-                    LEFT_RIGHT = !LEFT_RIGHT;
-                }
 
-                return false;
+                    return false;
+                }
             }
         }
         //오른쪽
-        else if (LEFT_RIGHT)
+       else if (rightMoving)
         {
+            if (_enemy.isJump)
+                _enemy.transform.position += Vector3.right * ((_enemy.MoveSpeed * 2.0f) * Time.deltaTime);
+            else
+                _enemy.transform.position += Vector3.right * (_enemy.MoveSpeed * Time.deltaTime);
+
             _enemy.animator.SetBool("Run", _enemy.isRun);
             _enemy.spriteRenderer.flipX = false;
 
-            if (_enemy.isJump)
-                _enemy.transform.position += Vector3.right * ( (_enemy.MoveSpeed * 2.0f) * Time.deltaTime);
-            else
-                _enemy.transform.position += Vector3.right * ( _enemy.MoveSpeed * Time.deltaTime);
-
-            //점프할 때 이동속도 증가
-            if (_enemy.groundInfo.rightPointDistance <= 0.9f)
+            if (_enemy.groundInfo.IsLowestGround)
             {
-                if (_enemy.groundInfo.rightJumpToDrop.EnemyJump &&
-                    _enemy.groundInfo.rightJumpToDrop.EnemyDrop &&
-                    !_enemy.isJump)
+                //점프박스와 거리 계산
+                for (int i = 0; i < _enemy.groundInfo.jumpBox.Length; ++i)
                 {
-                    int randomInt = Random.Range(0,2);
-                    if (randomInt == 0)
+                    Vector3 jumpBoxPos = new Vector3(
+                        _enemy.groundInfo.jumpBox[i].transform.position.x,
+                        _enemy.transform.position.y);
+
+                    //점프박스와 거리가 가까울 경우
+                    float dist = Vector3.Distance(jumpBoxPos, _enemy.transform.position);
+                    if (dist <= 0.9f)
+                    {
+                        //랜덤으로 점프 할지 안할지 결정
+                        int random = Random.Range(0, 2);
+
+                        //점프할 경우
+                        if (random == 1 && !_enemy.isJump)
+                        {
+                            timeDelay += 1.0f;
+                            _enemy.isJump = true;
+                            _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (_enemy.groundInfo.rightPointDistance <= 0.9f)
+                {
+                    if (_enemy.groundInfo.rightJumpToDrop.EnemyJump &&
+                        _enemy.groundInfo.rightJumpToDrop.EnemyDrop &&
+                        !_enemy.isJump)
+                    {
+                        int randomJumpToDrop = Random.Range(0, 2);
+                        //0 이면 점프
+                        if (randomJumpToDrop == 0 && !_enemy.isJump)
+                        {
+                            timeDelay += 1.0f;
+                            _enemy.isJump = true;
+                            _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
+                        }
+                        else
+                        {
+                            timeDelay += 1.0f;
+                        }
+                    }
+                    else if (_enemy.groundInfo.rightJumpToDrop.EnemyJump && !_enemy.isJump)
                     {
                         timeDelay += 1.0f;
                         _enemy.isJump = true;
                         _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
                     }
-                    else
+                    else if (!_enemy.groundInfo.rightJumpToDrop.EnemyDrop && !_enemy.isJump)
                     {
                         timeDelay += 1.0f;
+                        leftMoving = true;
+                        rightMoving = false;
                     }
-                }
-                else if (_enemy.groundInfo.rightJumpToDrop.EnemyJump && !_enemy.isJump)
-                {
-                    timeDelay += 1.0f;
-                    _enemy.isJump = true;
-                    _enemy.rigid.AddForce(new Vector2(0, _enemy.JumpPower), ForceMode2D.Impulse);
-                }
-                else if (!_enemy.groundInfo.rightJumpToDrop.EnemyDrop && !_enemy.isJump)
-                {
-                    timeDelay += 1.0f;
-                    LEFT_RIGHT = !LEFT_RIGHT;
-                }
 
-                return false;
+                    return false;
+                }
             }
+            //점프할 때 이동속도 증가
+            
         }
         
         return false;

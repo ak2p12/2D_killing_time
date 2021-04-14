@@ -30,8 +30,11 @@ public class Enemy : Unit
     Selecter selecter_1; //하나라도 true 면 true 반환
     Condition_IsDead condition_IsDead; //사망 유무 검사 
     Condition_NotFind condition_NotFind; //타겟 발견 
+    Condition_TargetDistance condition_TargetDistance; //타겟과의 거리
     Action_Dead action_Dead; //사망 행동 실행
-    Action_Roaming action_Roaming;
+    Action_Roaming action_Roaming; //적 찾기
+    Action_Trace action_Trace; //추적
+    
 
     [HideInInspector] public bool isRoaming; //적 순찰
 
@@ -52,11 +55,15 @@ public class Enemy : Unit
         selecter_1 = new Selecter();
         condition_NotFind = new Condition_NotFind();
         condition_IsDead = new Condition_IsDead();
+        condition_TargetDistance = new Condition_TargetDistance();
         action_Dead = new Action_Dead();
         action_Roaming = new Action_Roaming();
-
+        action_Trace = new Action_Trace();
         condition_NotFind.SetNode(action_Roaming);
         selecter_1.AddNode(condition_NotFind);
+        condition_TargetDistance.SetNode(action_Trace);
+        selecter_1.AddNode(condition_TargetDistance);
+        //selecter_1.AddNode();
         //condition_IsDead.SetNode(action_Dead);
         sequene_1.AddNode(selecter_1);
         //sequene_1.AddNode(condition_IsDead);
@@ -141,12 +148,41 @@ public class Condition_IsDead : Condition
         childNode = _node;
     }
 }
-//타켓 
+//타켓 발견 못했을때
 public class Condition_NotFind : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
     {
         if (!_enemy.isFind)
+            return true;
+
+        return false;
+    }
+
+    public override bool Result(Enemy _enemy)
+    {
+        if (ChackCondition(_enemy))
+        {
+            if (childNode != null && childNode.Result(_enemy))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override void SetNode(Node _node)
+    {
+        childNode = _node;
+    }
+}
+
+public class Condition_TargetDistance : Condition
+{
+    public override bool ChackCondition(Enemy _enemy)
+    {
+        float dist = Vector3.Distance(_enemy.transform.position , _enemy.target.transform.position);
+        if (dist > 2.0f)
             return true;
 
         return false;
@@ -215,7 +251,6 @@ public class TimeDelay : TimeOut
         originTime = 0.0f;
     }
 }
-
 //적을 찾는 행위
 public class Action_Roaming : ActionNode
 {
@@ -514,7 +549,53 @@ public class Action_Dead : ActionNode
         _enemy.spriteRenderer.color = new Color(1, 1, 1, 0);
         originTime = 0.0f;
         currentTime = 0.0f;
+        isStart = false;
+        return true;
+    }
+    public override bool Result(Enemy _enemy)
+    {
+        if (!isStart)
+            OnStart(_enemy);
+
+        if (OnUpdate(_enemy))
+        {
+            OnEnd(_enemy);
+            return true;
+        }
+
+        return false;
+    }
+}
+
+public class Action_Trace : ActionNode
+{
+    public override void OnStart(Enemy _enemy)
+    {
         isStart = true;
+    }
+    public override bool OnUpdate(Enemy _enemy)
+    {
+        Debug.Log("추적중");
+        if (_enemy.isTrace_Left)
+        {
+            _enemy.transform.position += Vector3.left * (_enemy.MoveSpeed * Time.deltaTime);
+            _enemy.isRun = true;
+            _enemy.animator.SetBool("Run", _enemy.isRun);
+            _enemy.spriteRenderer.flipX = true;
+        }
+        else if (_enemy.isTrace_Right)
+        {
+            _enemy.transform.position += Vector3.right * (_enemy.MoveSpeed * Time.deltaTime);
+            _enemy.isRun = true;
+            _enemy.animator.SetBool("Run", _enemy.isRun);
+            _enemy.spriteRenderer.flipX = false;
+        }
+
+        return false;
+    }
+    public override bool OnEnd(Enemy _enemy)
+    {
+        isStart = false;
         return true;
     }
     public override bool Result(Enemy _enemy)

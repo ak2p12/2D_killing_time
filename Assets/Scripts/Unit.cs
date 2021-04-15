@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour , IDamege
 {
+    [HideInInspector] public Ground groundInfo;
+
     public virtual bool Hit(float _damege)
     {
         Debug.Log("Unit Class : Hit();"); 

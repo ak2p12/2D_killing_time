@@ -14,7 +14,7 @@ public class EnemyFind : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player") )
         {
-            enemy.target = collision.gameObject.GetComponent<Transform>();
+            enemy.target = collision.gameObject.GetComponent<Unit>();
             enemy.isFind = true;
         }   
         

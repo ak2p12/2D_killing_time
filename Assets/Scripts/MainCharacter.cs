@@ -50,6 +50,8 @@ public class MainCharacter : Unit
 
     public MeleeAttack MeleeAttackBox;   //근접공격 충돌객체
 
+    //[HideInInspector] public Ground groundInfo;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -164,7 +166,7 @@ public class MainCharacter : Unit
         isAttack = false;
         isFirstAttack = false;
     }
-    void Dodge_End()//애니메이션에서 함수 호출
+    public void Dodge_End()//애니메이션에서 함수 호출
     {
         isDodge = false;
         isAttack = false;
@@ -209,6 +211,7 @@ public class MainCharacter : Unit
             isAttack = false;
             isFirstAttack = false;
             isDodge = false;
+            groundInfo = collision.gameObject.GetComponent<Ground>();
         }
 
     }

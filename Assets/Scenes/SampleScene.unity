@@ -238,7 +238,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 59473491}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.84, y: 10.59, z: 0}
+  m_LocalPosition: {x: 13.09, y: 9.26, z: 0}
   m_LocalScale: {x: 9.425, y: 1, z: 1}
   m_Children:
   - {fileID: 1370344085}
@@ -263,8 +263,10 @@ MonoBehaviour:
   rightJumpToDrop: {fileID: 0}
   leftPointDistance: 0
   rightPointDistance: 0
-  IsLowestGround: 0
   jumpBox: []
+  IsLowestGround: 0
+  pointDistance: 0
+  count: 0
 --- !u!212 &59473494
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -767,7 +769,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 168986501}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.1205, y: 0, z: 0}
+  m_LocalPosition: {x: 0.0571, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1778101336}
@@ -826,7 +828,7 @@ MonoBehaviour:
   AngleZ_1: -35
   AngleZ_2: -135
   AngleZ_3: -170
-  EnemyJump: 0
+  EnemyJump: 1
   EnemyDrop: 0
   LeftJump: 1
   RightJump: 0
@@ -1173,7 +1175,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 278291326}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.062, y: 0, z: 0}
+  m_LocalPosition: {x: -0.0598, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1778101336}
@@ -1232,7 +1234,7 @@ MonoBehaviour:
   AngleZ_1: 35
   AngleZ_2: 135
   AngleZ_3: 170
-  EnemyJump: 0
+  EnemyJump: 1
   EnemyDrop: 0
   LeftJump: 0
   RightJump: 1
@@ -1299,7 +1301,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 351242986}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.07, y: 1.49, z: 0}
+  m_LocalPosition: {x: 0.07, y: -0.3, z: 0}
   m_LocalScale: {x: 9.425, y: 1, z: 1}
   m_Children:
   - {fileID: 1762573490}
@@ -1324,8 +1326,10 @@ MonoBehaviour:
   rightJumpToDrop: {fileID: 0}
   leftPointDistance: 0
   rightPointDistance: 0
-  IsLowestGround: 0
   jumpBox: []
+  IsLowestGround: 0
+  pointDistance: 0
+  count: 0
 --- !u!212 &351242989
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2356,7 +2360,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.98, z: -10}
+  m_LocalPosition: {x: 0, y: 1.25, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2878,7 +2882,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 675566476}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.37, y: 4.55, z: 0}
+  m_LocalPosition: {x: -10.37, y: 3.22, z: 0}
   m_LocalScale: {x: 9.425, y: 1, z: 1}
   m_Children:
   - {fileID: 1361479159}
@@ -2903,8 +2907,10 @@ MonoBehaviour:
   rightJumpToDrop: {fileID: 0}
   leftPointDistance: 0
   rightPointDistance: 0
-  IsLowestGround: 0
   jumpBox: []
+  IsLowestGround: 0
+  pointDistance: 0
+  count: 0
 --- !u!212 &675566479
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3171,7 +3177,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 745735775}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.41, y: 7.52, z: 0}
+  m_LocalPosition: {x: 1.58, y: 6.62, z: 0}
   m_LocalScale: {x: 9.425, y: 1, z: 1}
   m_Children:
   - {fileID: 625084735}
@@ -3196,8 +3202,10 @@ MonoBehaviour:
   rightJumpToDrop: {fileID: 0}
   leftPointDistance: 0
   rightPointDistance: 0
-  IsLowestGround: 0
   jumpBox: []
+  IsLowestGround: 0
+  pointDistance: 0
+  count: 0
 --- !u!212 &745735778
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3307,26 +3315,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f4e740cb592804cb6f35c71c6d995d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundInfo: {fileID: 0}
   MoveSpeed: 3
   JumpPower: 20
   AttackSpeed: 1
   MeleeDamage: 1
   MaxHP: 100
   CurrentHP: 100
+  JumpSpeed: 0
   DestroyTime: 5
   FindRadius: 0
+  AttackRange: 0
   isRun: 0
   target: {fileID: 0}
-  isTrace_Left: 0
-  isTrace_Right: 0
+  isLeftMoving: 0
+  isRightMoving: 0
   isRoaming: 0
-  groundInfo: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
   isDead: 0
   isFind: 0
   isJump: 0
+  isAttack: 0
 --- !u!61 &759142069
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3343,8 +3354,8 @@ BoxCollider2D:
   m_Offset: {x: -0.02818495, y: 0.0035954714}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.5, y: 1.5}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 0.45, y: 0.51}
     newSize: {x: 1.5, y: 1.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -3773,7 +3784,7 @@ MonoBehaviour:
   AngleZ_1: -35
   AngleZ_2: -135
   AngleZ_3: -170
-  EnemyJump: 0
+  EnemyJump: 1
   EnemyDrop: 1
   LeftJump: 0
   RightJump: 0
@@ -3915,7 +3926,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 979234666}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.56, y: 10.27, z: 0}
+  m_LocalPosition: {x: -10.56, y: 8.940001, z: 0}
   m_LocalScale: {x: 9.425, y: 1, z: 1}
   m_Children:
   - {fileID: 1643510478}
@@ -3940,8 +3951,10 @@ MonoBehaviour:
   rightJumpToDrop: {fileID: 0}
   leftPointDistance: 0
   rightPointDistance: 0
-  IsLowestGround: 0
   jumpBox: []
+  IsLowestGround: 0
+  pointDistance: 0
+  count: 0
 --- !u!212 &979234669
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4155,26 +4168,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f4e740cb592804cb6f35c71c6d995d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundInfo: {fileID: 0}
   MoveSpeed: 3
   JumpPower: 20
   AttackSpeed: 1
   MeleeDamage: 1
   MaxHP: 100
   CurrentHP: 100
+  JumpSpeed: 0
   DestroyTime: 5
   FindRadius: 0
+  AttackRange: 0
   isRun: 0
   target: {fileID: 0}
-  isTrace_Left: 0
-  isTrace_Right: 0
+  isLeftMoving: 0
+  isRightMoving: 0
   isRoaming: 0
-  groundInfo: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
   isDead: 0
   isFind: 0
   isJump: 0
+  isAttack: 0
 --- !u!61 &1027119923
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4191,8 +4207,8 @@ BoxCollider2D:
   m_Offset: {x: -0.02818495, y: 0.0035954714}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.5, y: 1.5}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 0.45, y: 0.51}
     newSize: {x: 1.5, y: 1.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -4502,26 +4518,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f4e740cb592804cb6f35c71c6d995d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundInfo: {fileID: 0}
   MoveSpeed: 3
   JumpPower: 20
   AttackSpeed: 1
   MeleeDamage: 1
   MaxHP: 100
   CurrentHP: 100
+  JumpSpeed: 0
   DestroyTime: 5
   FindRadius: 0
+  AttackRange: 0
   isRun: 0
   target: {fileID: 0}
-  isTrace_Left: 0
-  isTrace_Right: 0
+  isLeftMoving: 0
+  isRightMoving: 0
   isRoaming: 0
-  groundInfo: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
   isDead: 0
   isFind: 0
   isJump: 0
+  isAttack: 0
 --- !u!61 &1080005092
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4538,8 +4557,8 @@ BoxCollider2D:
   m_Offset: {x: -0.02818495, y: 0.0035954714}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.5, y: 1.5}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 0.45, y: 0.51}
     newSize: {x: 1.5, y: 1.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -5955,8 +5974,8 @@ GameObject:
   - component: {fileID: 1555261685}
   - component: {fileID: 1555261684}
   - component: {fileID: 1555261683}
-  - component: {fileID: 1555261682}
   - component: {fileID: 1555261687}
+  - component: {fileID: 1555261682}
   m_Layer: 11
   m_Name: Enemy
   m_TagString: Enemy
@@ -5977,18 +5996,18 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.02818495, y: 0.0035954714}
+  m_Offset: {x: 0, y: 0.255}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.5, y: 1.5}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 0.45, y: 0.51}
     newSize: {x: 1.5, y: 1.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.40610808, y: 0.5287951}
+  m_Size: {x: 0.45, y: 0.51}
   m_EdgeRadius: 0
 --- !u!50 &1555261683
 Rigidbody2D:
@@ -6089,7 +6108,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1555261681}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.3199999, y: 17.96, z: 0}
+  m_LocalPosition: {x: -12.7, y: 3.21, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 593439827}
@@ -6108,26 +6127,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66f4e740cb592804cb6f35c71c6d995d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundInfo: {fileID: 0}
   MoveSpeed: 3
-  JumpPower: 20
+  JumpPower: 19
   AttackSpeed: 1
   MeleeDamage: 1
   MaxHP: 100
   CurrentHP: 100
+  JumpSpeed: 2.5
   DestroyTime: 5
   FindRadius: 0
+  AttackRange: 0
   isRun: 0
   target: {fileID: 0}
-  isTrace_Left: 0
-  isTrace_Right: 0
+  isLeftMoving: 0
+  isRightMoving: 0
   isRoaming: 0
-  groundInfo: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
   isDead: 0
   isFind: 0
   isJump: 0
+  isAttack: 0
 --- !u!1 &1577715460
 GameObject:
   m_ObjectHideFlags: 0
@@ -6155,7 +6177,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1577715460}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 11.03, y: 3.93, z: 0}
+  m_LocalPosition: {x: 12.67, y: 1.83, z: 0}
   m_LocalScale: {x: 9.425, y: 1, z: 1}
   m_Children:
   - {fileID: 18050914}
@@ -6256,8 +6278,10 @@ MonoBehaviour:
   rightJumpToDrop: {fileID: 0}
   leftPointDistance: 0
   rightPointDistance: 0
-  IsLowestGround: 0
   jumpBox: []
+  IsLowestGround: 0
+  pointDistance: 0
+  count: 0
 --- !u!1 &1595580189
 GameObject:
   m_ObjectHideFlags: 0
@@ -6983,8 +7007,10 @@ MonoBehaviour:
   rightJumpToDrop: {fileID: 0}
   leftPointDistance: 0
   rightPointDistance: 0
-  IsLowestGround: 1
   jumpBox: []
+  IsLowestGround: 1
+  pointDistance: 0
+  count: 0
 --- !u!212 &1778101338
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -7172,11 +7198,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2006755119}
-  - component: {fileID: 2006755118}
-  - component: {fileID: 2006755120}
   - component: {fileID: 2006755121}
   - component: {fileID: 2006755123}
   - component: {fileID: 2006755122}
+  - component: {fileID: 2006755118}
+  - component: {fileID: 2006755120}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -7184,7 +7210,40 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!212 &2006755118
+--- !u!95 &2006755118
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006755117}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 47a7cfa687f9ab94d879ff5da688f916, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!4 &2006755119
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006755117}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.29, y: 6.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &2006755120
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7234,39 +7293,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!4 &2006755119
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2006755117}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -19.01, y: -0.74, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &2006755120
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2006755117}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 47a7cfa687f9ab94d879ff5da688f916, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &2006755121
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7279,6 +7305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43ea3282868680f4f925372c12ebd267, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundInfo: {fileID: 0}
   Key_Left: 276
   Key_Right: 275
   Key_Up: 0
@@ -7288,7 +7315,7 @@ MonoBehaviour:
   Key_Dodge: 304
   MoveSpeed: 7
   DodgeSpeed: 15
-  JumpPower: 20
+  JumpPower: 19
   AttackSpeed: 2
   MeleeDamage: 10
   MaxHP: 1000

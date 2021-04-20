@@ -5,16 +5,18 @@ using UnityEngine;
 public class Enemy : Unit
 {
     //========== 캐릭터 정보 ==========//
+    public float JumpSpeed; //점프 속도
+    public float FindRadius; //인식 범위 (반지름)
+    public float AttackRange; //공격 거리
+
     public float MoveSpeed; //캐릭터 이동속도
     public float JumpPower; //점프 힘
     public float AttackSpeed; //공격속도
     public float MeleeDamage; //공격력
     public float MaxHP; //최대 체력
     public float CurrentHP; //현재 체력
-    public float JumpSpeed; //점프 속도
     public float DestroyTime; //소멸 시간
-    public float FindRadius; //인식 범위 (반지름)
-    public float AttackRange; //공격 거리
+    
 
     private int movingRandomCount;
     private float movingTimeCount;

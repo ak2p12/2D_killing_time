@@ -16,7 +16,7 @@ public class MeleeAttack : MonoBehaviour
 
         this.gameObject.SetActive(true);
 
-        survivalTime = 0.08f;
+        survivalTime = 0.05f;
         
         StartCoroutine(Update_Coroutine());
     }

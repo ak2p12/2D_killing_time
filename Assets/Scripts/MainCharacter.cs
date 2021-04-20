@@ -14,8 +14,10 @@ public class MainCharacter : Unit
     public KeyCode Key_Dodge;
 
     //========== 캐릭터 정보 ==========//
-    public float MoveSpeed; //캐릭터 이동속도
     public float DodgeSpeed; //캐릭터 구르기 속도
+    public float UseDodgePoint; //구르기 소모량
+
+    public float MoveSpeed; //캐릭터 이동속도
     public float JumpPower; //점프 힘
     public float AttackSpeed; //공격속도
     public float MeleeDamage; //공격력
@@ -29,7 +31,7 @@ public class MainCharacter : Unit
     public float CurrentSP; //현재 지구력
     public float RecoverySP; //체력회복력
     public float RecoveryCycle; //회복속도
-    public float UseDodgePoint; //구르기 소모량
+   
 
     bool leftorRight; //현재 캐릭터 방향이 왼쪽인지 오른쪽인지 구별 전용
     bool isFirstAttack; //첫번째 공격 모션과 두번째 공격모션 구별전용
@@ -66,7 +68,9 @@ public class MainCharacter : Unit
             if (Mathf.Abs(rigid.velocity.x) <= MoveSpeed)
                 rigid.AddForce(Vector3.left * MoveSpeed,ForceMode2D.Force);
             
-            animator.SetInteger("AnimState", 1);
+            if (isGround)
+                animator.SetInteger("AnimState", 1);
+
             leftorRight = spriteRenderer.flipX = true;
         }
         else if (Input.GetKey(Key_Right) && !isAttack && !isDodge)
@@ -74,17 +78,15 @@ public class MainCharacter : Unit
             if (Mathf.Abs(rigid.velocity.x) <= MoveSpeed)
                 rigid.AddForce(Vector3.right * MoveSpeed, ForceMode2D.Force);
 
-            animator.SetInteger("AnimState", 1);
+            if (isGround)
+                animator.SetInteger("AnimState", 1);
+
             leftorRight = spriteRenderer.flipX = false;
         }
         else
         {
             animator.SetInteger("AnimState", 0);
-            rigid.velocity = new Vector2(0, rigid.velocity.y);
         }    
-            
-
-        Debug.Log(rigid.velocity.y.ToString());
         //===================================//
     }
     void Jump()
@@ -92,12 +94,13 @@ public class MainCharacter : Unit
         //========== 점프 ==========//
         if ((Input.GetKeyDown(Key_Up) || Input.GetKeyDown(Key_Jump)) && !isJump && !isDodge)
         {
-            animator.SetTrigger("Jump");
             rigid.AddForce(Vector2.up * JumpPower, ForceMode2D.Impulse);
             isGround = false;
             isJump = true;
-
-            Attack_End();
+            animator.SetTrigger("Jump");
+            animator.SetBool("Ground", isGround);
+            animator.SetBool("JumpState" , isJump);
+            //Attack_End();
         }
 
         animator.SetFloat("G_Acceleration", rigid.velocity.y);
@@ -132,28 +135,27 @@ public class MainCharacter : Unit
         //구르기
         if (Input.GetKeyDown(Key_Dodge) && !isDodge && isGround && (CurrentSP >= UseDodgePoint))
         {
-            isDodge = true;
-            CurrentSP -= UseDodgePoint;
-            if (CurrentSP <= 0.0f)
-                CurrentSP = 0.0f;
             if (Input.GetKey(Key_Left))
                 leftorRight = spriteRenderer.flipX = true;
             else if (Input.GetKey(Key_Right))
                 leftorRight = spriteRenderer.flipX = false;
 
+            rigid.velocity = new Vector2(0, rigid.velocity.y);
+
+            isDodge = true;
             animator.SetTrigger("Dodge");
+            animator.SetBool("DodgeState" , isDodge);
 
-        }
+            CurrentSP -= UseDodgePoint;
+            if (CurrentSP <= 0.0f)
+                CurrentSP = 0.0f;
 
-        //구르기 중
-        if (isDodge)
-        {
-            //왼쪽 구르기
-            if (leftorRight)
-                transform.position += new Vector3(-1, 0, 0) * (DodgeSpeed * Time.deltaTime);
             //오른쪽 구르기
-            else
-                transform.position += new Vector3(1, 0, 0) * (DodgeSpeed * Time.deltaTime);
+            if (!leftorRight)
+                rigid.AddForce(Vector2.right * DodgeSpeed , ForceMode2D.Impulse);
+            //왼쪽 구르기
+            else if (leftorRight)
+                rigid.AddForce(Vector2.left * DodgeSpeed, ForceMode2D.Impulse);
         }
     }
     void FirstAttack_End() //애니메이션에서 함수 호출
@@ -174,6 +176,7 @@ public class MainCharacter : Unit
     public void Dodge_End()//애니메이션에서 함수 호출
     {
         isDodge = false;
+        animator.SetBool("DodgeState", isDodge);
         isAttack = false;
         isFirstAttack = false;
     }
@@ -203,32 +206,35 @@ public class MainCharacter : Unit
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //충돌 객체가 땅
-        if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
-        {
-            isGround = true;
-
-            if (isLanding)
-                isJump = false;
-
-            animator.SetBool("Ground", isGround);
-
-            isAttack = false;
-            isFirstAttack = false;
-            isDodge = false;
-            groundInfo = collision.gameObject.GetComponent<Ground>();
-        }
 
     }
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
-            isGround = true;
 
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
-        //충돌한 객체가 땅이면서 땅과 충돌한 객체가 발인경우
+
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
+        {
+            groundInfo = collision.gameObject.GetComponent<Ground>();
+        }
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
+        {
+            isJump = false;
+            isGround = true;
+            animator.SetBool("JumpState", isJump);
+            animator.SetBool("Ground", isGround);
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
         if ((collision.gameObject.layer == LayerMask.NameToLayer("Ground")))
         {
             isGround = false;

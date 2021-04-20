@@ -31,9 +31,6 @@ public class MainCharacter : Unit
     public float RecoveryCycle; //회복속도
     public float UseDodgePoint; //구르기 소모량
 
-    float horizontal;   //수평
-    float vertical; //수직
-
     bool leftorRight; //현재 캐릭터 방향이 왼쪽인지 오른쪽인지 구별 전용
     bool isFirstAttack; //첫번째 공격 모션과 두번째 공격모션 구별전용
 
@@ -66,20 +63,28 @@ public class MainCharacter : Unit
         //========== 좌우 이동 ==========//
         if (Input.GetKey(Key_Left) && !isAttack && !isDodge)
         {
-            horizontal = Input.GetAxis("Horizontal");
-            transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
+            if (Mathf.Abs(rigid.velocity.x) <= MoveSpeed)
+                rigid.AddForce(Vector3.left * MoveSpeed,ForceMode2D.Force);
+            
             animator.SetInteger("AnimState", 1);
             leftorRight = spriteRenderer.flipX = true;
         }
         else if (Input.GetKey(Key_Right) && !isAttack && !isDodge)
         {
-            horizontal = Input.GetAxis("Horizontal");
-            transform.position += new Vector3(horizontal, 0, 0) * (MoveSpeed * Time.deltaTime);
+            if (Mathf.Abs(rigid.velocity.x) <= MoveSpeed)
+                rigid.AddForce(Vector3.right * MoveSpeed, ForceMode2D.Force);
+
             animator.SetInteger("AnimState", 1);
             leftorRight = spriteRenderer.flipX = false;
         }
         else
+        {
             animator.SetInteger("AnimState", 0);
+            rigid.velocity = new Vector2(0, rigid.velocity.y);
+        }    
+            
+
+        Debug.Log(rigid.velocity.y.ToString());
         //===================================//
     }
     void Jump()
@@ -88,7 +93,7 @@ public class MainCharacter : Unit
         if ((Input.GetKeyDown(Key_Up) || Input.GetKeyDown(Key_Jump)) && !isJump && !isDodge)
         {
             animator.SetTrigger("Jump");
-            rigid.AddForce(new Vector2(0, JumpPower), ForceMode2D.Impulse);
+            rigid.AddForce(Vector2.up * JumpPower, ForceMode2D.Impulse);
             isGround = false;
             isJump = true;
 

@@ -4,34 +4,9 @@ using UnityEngine;
 
 public class MainCharacter : Unit
 {
-    //========== 입력 ==========//
-    public KeyCode Key_Left;
-    public KeyCode Key_Right;
-    public KeyCode Key_Up;
-    public KeyCode Key_Down;
-    public KeyCode Key_Jump;
-    public KeyCode Key_Attack;
-    public KeyCode Key_Dodge;
-
     //========== 캐릭터 정보 ==========//
     public float DodgeSpeed; //캐릭터 구르기 속도
     public float UseDodgePoint; //구르기 소모량
-
-    public float MoveSpeed; //캐릭터 이동속도
-    public float JumpPower; //점프 힘
-    public float AttackSpeed; //공격속도
-    public float MeleeDamage; //공격력
-    public float MaxHP; //최대 체력
-    public float CurrentHP; //현재 체력
-    public float RecoveryHP; //체력회복력
-    public float MaxMP; //최대 마력
-    public float CurrentMP; //현재 마력
-    public float RecoveryMP; //체력회복력
-    public float MaxSP; //최대 지구력
-    public float CurrentSP; //현재 지구력
-    public float RecoverySP; //체력회복력
-    public float RecoveryCycle; //회복속도
-   
 
     bool leftorRight; //현재 캐릭터 방향이 왼쪽인지 오른쪽인지 구별 전용
     bool isFirstAttack; //첫번째 공격 모션과 두번째 공격모션 구별전용
@@ -40,8 +15,15 @@ public class MainCharacter : Unit
     bool isJump;    //점프 했는지
     bool isAttack;  //공격 중인지
     bool isDodge; //회피 중인지
-    bool isLanding; //떨어지는 중인지
 
+    //========== 입력 ==========//
+    public KeyCode Key_Left;
+    public KeyCode Key_Right;
+    public KeyCode Key_Up;
+    public KeyCode Key_Down;
+    public KeyCode Key_Jump;
+    public KeyCode Key_Attack;
+    public KeyCode Key_Dodge;
 
     SpriteRenderer spriteRenderer;
     Animator animator;
@@ -105,10 +87,10 @@ public class MainCharacter : Unit
 
         animator.SetFloat("G_Acceleration", rigid.velocity.y);
 
-        if (rigid.velocity.y < 0.0f)
-            isLanding = true;
-        else
-            isLanding = false;
+        //if (rigid.velocity.y < 0.0f)
+        //    isLanding = true;
+        //else
+        //    isLanding = false;
         //==========================//
     }
     void Attack()

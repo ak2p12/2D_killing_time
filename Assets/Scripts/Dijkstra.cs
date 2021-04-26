@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public struct PostionNode
 {
     public Vector2 Position; //노드 위치
-    public int NodeIndex; //자기 자신의 인덱스
     public int[] ConnectedNodeIndex; //연결된 노드 인덱스
 }
 
@@ -22,7 +21,8 @@ public class Dijkstra : MonoBehaviour
     public PostionNode[] Nodes;
     DijkstraNode[,] Distances; 
 
-    public int[] final; 
+    public int[] final;
+    List<int> a;
     DijkstraNode[] finalDistances; 
 
     // Start is called before the first frame update
@@ -31,10 +31,11 @@ public class Dijkstra : MonoBehaviour
         Distances = new DijkstraNode[Nodes.Length, Nodes.Length];
         final = new int[Nodes.Length];
         finalDistances = new DijkstraNode[Nodes.Length];
-
+        a = new List<int>();
         for (int i = 0; i < finalDistances.Length; ++i)
         {
-            finalDistances[i].Deistance = 9999.0f;
+            finalDistances[i].Deistance = 9999.9f;
+            final[i] = 9999;
             finalDistances[i].Check = false;
         }
 
@@ -42,7 +43,7 @@ public class Dijkstra : MonoBehaviour
         {
             for(int j = 0; j < Nodes.Length; ++j)
             {
-                Distances[i, j].Deistance = 9999.0f;
+                Distances[i, j].Deistance = 9999.9f;
             }
         }
 
@@ -56,53 +57,64 @@ public class Dijkstra : MonoBehaviour
             }
         }
 
-        StartDijkstra(0, 6);
+        StartDijkstra(0);
     }
     int Min(DijkstraNode[] _finalDistances)
     {
         float dist = 99999.0f;
-        int min = 9999;
+        int min = 99999;
 
         for (int i = 0; i < _finalDistances.Length; ++i)
         {
-            if (dist > _finalDistances[i].Deistance)
+            if (dist > _finalDistances[i].Deistance && _finalDistances[i].Check == false)
             {
                 dist = _finalDistances[i].Deistance;
                 min = i;
             }
         }
- 
+        if (min > Nodes.Length)
+            return min;
+
+        for (int i = 0; i < final.Length; ++i)
+        {
+            if (final[i] > min)
+            {
+                final[i] = min;
+                break;
+            }
+                
+        }
+        _finalDistances[min].Check = true;
         return min;
     }
 
-    public void SetUpDijkstra(int _startIndex , int _endIndex , int _nextIndex = 0)
+    public void SetUpDijkstra(int _startIndex)
     {
        int min =  Min(finalDistances);
-        //if (finalDistances[_nextIndex].Check == true)
-        //    return;
+        a.Add(min);
+        if (min > Nodes.Length)
+            return;
 
-        //finalDistances[_nextIndex].Check = true;
+        for (int i = 0; i < Nodes[min].ConnectedNodeIndex.Length; ++i )
+        {
+            float dist = finalDistances[min].Deistance + 
+                         Distances[min, Nodes[min].ConnectedNodeIndex[i]].Deistance;
 
-        //for (int i = 0; i < Nodes[_nextIndex].ConnectedNodeIndex.Length; ++i )
-        //{
-        //    float dist = Distances[_startIndex, _nextIndex].Deistance +
-        //                 Distances[_startIndex, Nodes[_nextIndex].ConnectedNodeIndex[i]].Deistance;
+            if (dist < finalDistances[Nodes[min].ConnectedNodeIndex[i]].Deistance)
+                finalDistances[Nodes[min].ConnectedNodeIndex[i]].Deistance = dist;
+        }
 
-        //    if (dist < Distances[_startIndex, Nodes[_nextIndex].ConnectedNodeIndex[i]].Deistance)
-        //    {
-        //        Distances[_startIndex, Nodes[_nextIndex].ConnectedNodeIndex[i]].Deistance = dist;
-        //    }
-        //}
+        SetUpDijkstra(_startIndex);
     }
 
-    public void StartDijkstra(int _startIndex , int _endIndex)
+    public void StartDijkstra(int _startIndex)
     {
         for (int i = 0; i < Nodes.Length; ++i)
         {
             finalDistances[i] = Distances[_startIndex, i];
         }
 
-        SetUpDijkstra(_startIndex , _endIndex);
+        SetUpDijkstra(_startIndex);
     }
     private void OnDrawGizmos()
     {
@@ -110,7 +122,7 @@ public class Dijkstra : MonoBehaviour
         {
             foreach(PostionNode _node in Nodes)
             {
-                Gizmos.DrawWireSphere(_node.Position, 0.5f);
+                Gizmos.DrawWireSphere(_node.Position, 0.3f);
                 for (int i = 0; i < _node.ConnectedNodeIndex.Length; ++i )
                 {
                     Gizmos.DrawLine(_node.Position , Nodes[_node.ConnectedNodeIndex[i]].Position);
@@ -125,16 +137,15 @@ public class Dijkstra : MonoBehaviour
     {
         if (Nodes != null)
         {
-            foreach (PostionNode _node in Nodes)
+            for (int i = 0; i < Nodes.Length; ++i)
             {
-                Vector3 temp = Camera.main.WorldToScreenPoint(_node.Position);
+                Vector3 temp = Camera.main.WorldToScreenPoint(Nodes[i].Position);
                 //Debug.Log(temp.ToString());
                 GUI.Label(Rect.MinMaxRect(
                     temp.x - 10,
                     (1080 - temp.y),
                     temp.x + 10,
-                    (1080 - temp.y) + 100) , _node.NodeIndex.ToString());
-
+                    (1080 - temp.y) + 100), i.ToString());
             }
         }
         

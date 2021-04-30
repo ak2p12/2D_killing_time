@@ -1105,7 +1105,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &593439827
 Transform:
   m_ObjectHideFlags: 0
@@ -1342,20 +1342,20 @@ MonoBehaviour:
   CurrentSP: 0
   RecoverySP: 0
   RecoveryCycle: 0
+  IsDead: 0
   JumpSpeed: 0
   FindRadius: 0
   AttackRange: 0
   DestroyTime: 5
-  isRun: 0
   target: {fileID: 0}
-  isRoaming: 0
+  dijkstra: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
-  isDead: 0
-  isFind: 0
-  isJump: 0
-  isAttack: 0
+  IsRun: 0
+  IsFind: 0
+  IsJump: 0
+  IsAttack: 0
 --- !u!61 &759142069
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1706,20 +1706,20 @@ MonoBehaviour:
   CurrentSP: 0
   RecoverySP: 0
   RecoveryCycle: 0
+  IsDead: 0
   JumpSpeed: 0
   FindRadius: 0
   AttackRange: 0
   DestroyTime: 5
-  isRun: 0
   target: {fileID: 0}
-  isRoaming: 0
+  dijkstra: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
-  isDead: 0
-  isFind: 0
-  isJump: 0
-  isAttack: 0
+  IsRun: 0
+  IsFind: 0
+  IsJump: 0
+  IsAttack: 0
 --- !u!61 &1027119923
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1900,20 +1900,20 @@ MonoBehaviour:
   CurrentSP: 0
   RecoverySP: 0
   RecoveryCycle: 0
+  IsDead: 0
   JumpSpeed: 0
   FindRadius: 0
   AttackRange: 0
   DestroyTime: 5
-  isRun: 0
   target: {fileID: 0}
-  isRoaming: 0
+  dijkstra: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
-  isDead: 0
-  isFind: 0
-  isJump: 0
-  isAttack: 0
+  IsRun: 0
+  IsFind: 0
+  IsJump: 0
+  IsAttack: 0
 --- !u!61 &1080005092
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2398,13 +2398,13 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_GravityScale: 5
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 5
+  m_Constraints: 4
 --- !u!95 &1555261684
 Animator:
   serializedVersion: 3
@@ -2483,7 +2483,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1555261681}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.74, y: 1.83, z: 0}
+  m_LocalPosition: {x: -6.9, y: 1.83, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 593439827}
@@ -2518,20 +2518,20 @@ MonoBehaviour:
   CurrentSP: 0
   RecoverySP: 0
   RecoveryCycle: 0
+  IsDead: 0
   JumpSpeed: 2.5
   FindRadius: 0
   AttackRange: 0
   DestroyTime: 5
-  isRun: 0
   target: {fileID: 0}
-  isRoaming: 0
+  dijkstra: {fileID: 0}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
   rigid: {fileID: 0}
-  isDead: 0
-  isFind: 0
-  isJump: 0
-  isAttack: 0
+  IsRun: 0
+  IsFind: 0
+  IsJump: 0
+  IsAttack: 0
 --- !u!1 &1584388450
 GameObject:
   m_ObjectHideFlags: 0
@@ -3026,8 +3026,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1778101335}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.21, y: -3.16, z: 0}
-  m_LocalScale: {x: 75.544, y: 1, z: 1}
+  m_LocalPosition: {x: 0.21, y: -4, z: 0}
+  m_LocalScale: {x: 75, y: 1, z: 1}
   m_Children:
   - {fileID: 278291327}
   - {fileID: 168986502}
@@ -3358,6 +3358,7 @@ MonoBehaviour:
   CurrentSP: 500
   RecoverySP: 50
   RecoveryCycle: 3
+  IsDead: 0
   DodgeSpeed: 20
   UseDodgePoint: 100
   Key_Left: 276
@@ -3406,7 +3407,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
-  m_Mass: 1.0950259
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 5
@@ -3535,7 +3536,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2110706484
 Transform:
   m_ObjectHideFlags: 0
@@ -3614,24 +3615,47 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Nodes:
-  - Position: {x: 0, y: 0}
-    ConnectedNodeIndex: 01000000
-  - Position: {x: 2, y: 1}
+  - Position: {x: -9, y: 1.5}
+    ConnectedNodeIndex: 0100000009000000
+    IsJump: 0
+    IsDrop: 1
+  - Position: {x: -4, y: 1.5}
     ConnectedNodeIndex: 0000000002000000
-  - Position: {x: 4, y: 2}
-    ConnectedNodeIndex: 0100000007000000
-  - Position: {x: 4, y: -1}
-    ConnectedNodeIndex: 0400000006000000
-  - Position: {x: 4, y: -3}
-    ConnectedNodeIndex: 03000000
-  - Position: {x: 8, y: -3}
-    ConnectedNodeIndex: 0600000009000000
-  - Position: {x: 8, y: -1}
-    ConnectedNodeIndex: 030000000500000007000000
-  - Position: {x: 8, y: 2}
-    ConnectedNodeIndex: 020000000600000008000000
-  - Position: {x: 10, y: 2}
+    IsJump: 0
+    IsDrop: 0
+  - Position: {x: 1, y: 1.5}
+    ConnectedNodeIndex: 01000000030000000a000000
+    IsJump: 1
+    IsDrop: 1
+  - Position: {x: 5, y: 4.5}
+    ConnectedNodeIndex: 020000000400000008000000
+    IsJump: 1
+    IsDrop: 1
+  - Position: {x: 10, y: 4.5}
+    ConnectedNodeIndex: 0300000005000000
+    IsJump: 0
+    IsDrop: 0
+  - Position: {x: 15, y: 4.5}
+    ConnectedNodeIndex: 04000000
+    IsJump: 0
+    IsDrop: 0
+  - Position: {x: -9, y: 7.5}
     ConnectedNodeIndex: 07000000
-  - Position: {x: 12, y: -3}
-    ConnectedNodeIndex: 05000000
-  final: 
+    IsJump: 0
+    IsDrop: 0
+  - Position: {x: -4, y: 7.5}
+    ConnectedNodeIndex: 0600000008000000
+    IsJump: 0
+    IsDrop: 0
+  - Position: {x: 1, y: 7.5}
+    ConnectedNodeIndex: 0700000003000000
+    IsJump: 0
+    IsDrop: 1
+  - Position: {x: -12, y: -3.5}
+    ConnectedNodeIndex: 000000000a000000
+    IsJump: 1
+    IsDrop: 0
+  - Position: {x: 4, y: -3.5}
+    ConnectedNodeIndex: 0200000009000000
+    IsJump: 1
+    IsDrop: 0

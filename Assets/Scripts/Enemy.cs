@@ -9,15 +9,16 @@ public class Enemy : Unit
     public float FindRadius; //인식 범위 (반지름)
     public float AttackRange; //공격 거리
     public float DestroyTime; //소멸 시간
-    
+    float actionTime; //생성 후 행동 시간
+    float currentActionTime; //생성 후 행동 시간
+    bool isStart; //행동시작 
     private int movingRandomCount;
     private float movingTimeCount;
 
-    [HideInInspector] public bool isRun; //움직이고 있는지
-
-    //============== AI ==============//
+    
     [HideInInspector] public Unit target;
 
+    //============== AI ==============//
     BehaviorTree bt; //메인루프
     Sequence sequene_1; //하나라도 false 면 false 반환
     Selecter selecter_1; //하나라도 true 면 true 반환
@@ -28,24 +29,39 @@ public class Enemy : Unit
     Action_Roaming action_Roaming; //적 찾기
     Action_Trace action_Trace; //추적
 
+    
+    [HideInInspector] public Dijkstra dijkstra; //다익스트라
+    
+    //
 
-    [HideInInspector] public bool isRoaming; //적 순찰
 
     [HideInInspector] public SpriteRenderer spriteRenderer;
     [HideInInspector] public Animator animator;
     [HideInInspector] public Rigidbody2D rigid;
 
-    [HideInInspector] public bool isDead;
-    [HideInInspector] public bool isFind;
-    [HideInInspector] public bool isJump;
-    [HideInInspector] public bool isAttack;
+    [HideInInspector] public bool IsRun; //움직이고 있는지
+    [HideInInspector] public bool IsFind;
+    [HideInInspector] public bool IsJump;
+    [HideInInspector] public bool IsAttack;
 
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         rigid = GetComponent<Rigidbody2D>();
-        //
+        dijkstra = GameObject.Find("Grounds").GetComponent<Dijkstra>();
+
+
+        currentActionTime = actionTime = 0.3f;
+        bt = new BehaviorTree();
+        sequene_1 = new Sequence();
+        selecter_1 = new Selecter();
+        action_Roaming = new Action_Roaming();
+
+        selecter_1.AddNode(action_Roaming);
+        sequene_1.AddNode(selecter_1);
+        bt.Init(sequene_1);
+
         StartCoroutine(Update_Coroutine());
     }
 
@@ -53,6 +69,31 @@ public class Enemy : Unit
     {
         while (true)
         {
+            if (isStart)
+            {
+                if (bt.Result(this))
+                {
+                    Debug.Log("AI 종료");
+                }
+                else
+                {
+                    //IsRun = true;
+                    //rigid.AddForce(Vector3.left * MoveSpeed, ForceMode2D.Force);
+                    //animator.SetBool("Run", IsRun);
+                    //spriteRenderer.flipX = true;
+                }
+            }
+            else
+            {
+                currentActionTime -= Time.deltaTime;
+                if (currentActionTime <= 0)
+                {
+                    isStart = true;
+                    currentActionTime = actionTime;
+                    Debug.Log("AI 시작");
+                }    
+            }
+            
             yield return null;
         }
     }
@@ -83,7 +124,7 @@ public class Enemy : Unit
 
     private void OnDrawGizmos()
     {
-        if (isFind)
+        if (IsFind)
         {
             spriteRenderer.color = Color.red;
         }
@@ -95,7 +136,7 @@ public class Condition_IsDead : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
     {
-        if (_enemy.isDead)
+        if (_enemy.IsDead)
             return true;
 
         return false;
@@ -123,7 +164,7 @@ public class Condition_NotFind : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
     {
-        if (!_enemy.isFind)
+        if (!_enemy.IsFind)
             return true;
 
         return false;
@@ -224,52 +265,89 @@ public class TimeDelay : TimeOut
 //적을 찾는 행위
 public class Action_Roaming : ActionNode
 {
-    bool leftMoving;
-    bool rightMoving;
-    bool notMoving;
-    bool notJumping;
-
-    float currentTime;
-    float originTime;
-    float timeDelay;
+    bool isArrival;
+    int targetIndex;
+    bool jumpCheck;
 
     public override void OnStart(Enemy _enemy)
     {
-        leftMoving = rightMoving = notMoving = notJumping = false;
-        currentTime = originTime = 0.0f;
-        _enemy.isJump = false;
         isStart = true;
+        isArrival = true;
+        jumpCheck = false;
+        targetIndex = 9999;
 
-        int random = Random.Range(0, 10);
-        //왼쪽
-        if (random >= 0 && random <= 2)
+        float shortDist = 9999.0f;
+        int index = 9999;
+        for (int i = 0; i < _enemy.dijkstra.Nodes.Length; ++i)
         {
-            leftMoving = true;
-            _enemy.isRun = true;
-            timeDelay = Random.Range(3.0f, 5.0f);
-
+            float dist = Vector2.Distance(_enemy.transform.position , _enemy.dijkstra.Nodes[i].Position);
+            if (dist < shortDist)
+            {
+                shortDist = dist;
+                index = i;
+            }
         }
-        //오른쪽
-        else if (random >= 3 && random <= 5)
-        {
-            rightMoving = true;
-            _enemy.isRun = true;
-            timeDelay = Random.Range(3.0f, 5.0f);
-        }
-        //안움직임
-        else
-        {
-            _enemy.isRun = false;
-            notMoving = true;
-            timeDelay = 1.0f;
-        }
-
-        originTime = Time.time;
-
-
+        int random = Random.Range(0 , _enemy.dijkstra.Nodes.Length);
+        //_enemy.dijkstra.StartDijkstra(index , random);
+        _enemy.dijkstra.StartDijkstra(0 , 6);
+        
     }
     public override bool OnUpdate(Enemy _enemy)
     {
+        if (isArrival)
+        {
+            
+            targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
+            isArrival = false;
+           
+                
+            Debug.Log(targetIndex.ToString());
+        }
+        else
+        {
+            //Vector3 center = (sunrise.position + sunset.position) * 0.5F;
+            //center -= new Vector3(0, 1, 0);
+            //Vector3 riseRelCenter = sunrise.position - center;
+            //Vector3 setRelCenter = sunset.position - center;
+            //float fracComplete = (Time.time - startTime) / journeyTime;
+            //transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, fracComplete);
+            //transform.position += center;
+
+
+            Vector2 nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position;
+            Vector2 enemyPosition = _enemy.transform.position;
+            Vector2 dist = nodePosition - enemyPosition;
+            _enemy.IsRun = true;
+
+            _enemy.transform.position += (Vector3)dist.normalized * (_enemy.MoveSpeed * Time.deltaTime);
+            _enemy.animator.SetBool("Run" , _enemy.IsRun);
+
+            if (dist.normalized.x < 0.0f)
+                _enemy.spriteRenderer.flipX = true;
+            else
+                _enemy.spriteRenderer.flipX = false;
+            
+
+            float distance = Vector2.Distance(nodePosition , enemyPosition);
+
+            if (distance < 0.2f)
+            {
+                if (_enemy.dijkstra.Nodes[targetIndex].IsJump == true)
+                    jumpCheck = true;
+                    
+                isArrival = true;
+            }
+
+            if (jumpCheck == true)
+            {
+                _enemy.rigid.AddForce((Vector3.up + (Vector3)dist.normalized).normalized * _enemy.JumpPower, ForceMode2D.Impulse);
+                jumpCheck = false;
+            }
+
+            //Debug.Log(dist.ToString());
+            // Debug.Log(dist.normalized.ToString());
+        }
+        
         return false;
     }
     public override bool OnEnd(Enemy _enemy)

@@ -48,7 +48,7 @@ public class MainCharacter : Unit
         if (Input.GetKey(Key_Left) && !isAttack && !isDodge)
         {
             if (Mathf.Abs(rigid.velocity.x) <= MoveSpeed)
-                rigid.AddForce(Vector3.left * MoveSpeed,ForceMode2D.Force);
+                rigid.AddForce(Vector3.left * MoveSpeed, ForceMode2D.Force);
             
             if (isGround)
                 animator.SetInteger("AnimState", 1);
@@ -58,7 +58,7 @@ public class MainCharacter : Unit
         else if (Input.GetKey(Key_Right) && !isAttack && !isDodge)
         {
             if (Mathf.Abs(rigid.velocity.x) <= MoveSpeed)
-                rigid.AddForce(Vector3.right * MoveSpeed, ForceMode2D.Force);
+                rigid.AddForce(Vector3.right * MoveSpeed , ForceMode2D.Force);
 
             if (isGround)
                 animator.SetInteger("AnimState", 1);
@@ -77,6 +77,7 @@ public class MainCharacter : Unit
         if ((Input.GetKeyDown(Key_Up) || Input.GetKeyDown(Key_Jump)) && !isJump && !isDodge)
         {
             rigid.AddForce(Vector2.up * JumpPower, ForceMode2D.Impulse);
+            
             isGround = false;
             isJump = true;
             animator.SetTrigger("Jump");

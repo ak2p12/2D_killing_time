@@ -19,6 +19,7 @@ public class Unit : MonoBehaviour , IDamege
     public float CurrentSP; //현재 지구력
     public float RecoverySP; //체력회복력
     public float RecoveryCycle; //회복속도
+    public bool IsDead;
 
     public virtual bool Hit(float _damege)
     {

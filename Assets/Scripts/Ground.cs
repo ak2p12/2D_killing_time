@@ -6,9 +6,6 @@ public class Ground : MonoBehaviour
 {
     [HideInInspector] public MainCharacter Player;
     public bool IsLowestGround;
-    BoxCollider2D box;
-    
-
 
     void Start()
     {

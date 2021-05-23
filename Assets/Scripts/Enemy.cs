@@ -131,7 +131,7 @@ public class Enemy : Unit
     }
 }
 
-//사망 판별
+
 public class Condition_IsDead : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
@@ -158,8 +158,8 @@ public class Condition_IsDead : Condition
     {
         childNode = _node;
     }
-}
-//타켓 발견 못했을때
+} //사망 판별
+
 public class Condition_NotFind : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
@@ -186,7 +186,7 @@ public class Condition_NotFind : Condition
     {
         childNode = _node;
     }
-}
+} //타켓 발견 못했을때
 
 public class Condition_TargetDistance : Condition
 {
@@ -216,7 +216,7 @@ public class Condition_TargetDistance : Condition
         childNode = _node;
     }
 }
-//시간 
+
 public class TimeDelay : TimeOut
 {
     public override bool ChackCondition(Enemy _enemy)
@@ -261,19 +261,19 @@ public class TimeDelay : TimeOut
         currentTime = 0.0f;
         originTime = 0.0f;
     }
-}
-//적을 찾는 행위
-public class Action_Roaming : ActionNode
+} //시간 
+
+public class Action_Roaming : ActionNode //적을 찾는 행위
 {
     bool isArrival;
     int targetIndex;
     bool jumpCheck;
+    float startTime;
 
     public override void OnStart(Enemy _enemy)
     {
         isStart = true;
-        isArrival = true;
-        jumpCheck = false;
+        _enemy.IsRun = true;
         targetIndex = 9999;
 
         float shortDist = 9999.0f;
@@ -287,67 +287,106 @@ public class Action_Roaming : ActionNode
                 index = i;
             }
         }
+
         int random = Random.Range(0 , _enemy.dijkstra.Nodes.Length);
-        //_enemy.dijkstra.StartDijkstra(index , random);
-        _enemy.dijkstra.StartDijkstra(0 , 6);
-        
+        _enemy.dijkstra.StartDijkstra(index , random);
+        //_enemy.dijkstra.StartDijkstra(0 , 6);
+
+        targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
     }
     public override bool OnUpdate(Enemy _enemy)
     {
-        if (isArrival)
-        {
-            
-            targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
-            isArrival = false;
-           
-                
-            Debug.Log(targetIndex.ToString());
-        }
+        Vector2 nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position; //이동 할려는 노드의 위치
+        Vector2 enemyPosition = _enemy.transform.position; //적의 위치
+        Vector2 dist = nodePosition - enemyPosition; //적이 목표노드를 바라보는 방향
+
+        _enemy.transform.position += (Vector3)dist.normalized * (_enemy.MoveSpeed * Time.deltaTime);
+        _enemy.animator.SetBool("Run", _enemy.IsRun);
+
+        if (dist.normalized.x < 0.0f) //적 캐릭터 방향
+            _enemy.spriteRenderer.flipX = true;
         else
+            _enemy.spriteRenderer.flipX = false;
+
+        float distance = Vector2.Distance(nodePosition, enemyPosition); //적과 목표노드까지의 거리
+
+        if (distance < 0.1f) 
         {
-            //Vector3 center = (sunrise.position + sunset.position) * 0.5F;
-            //center -= new Vector3(0, 1, 0);
-            //Vector3 riseRelCenter = sunrise.position - center;
-            //Vector3 setRelCenter = sunset.position - center;
-            //float fracComplete = (Time.time - startTime) / journeyTime;
-            //transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, fracComplete);
-            //transform.position += center;
+            if (_enemy.dijkstra.Nodes[targetIndex].IsJump) //현재 위치에 있는 노드에서 점프를 해야 될 때
+            {
+                targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
 
-
-            Vector2 nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position;
-            Vector2 enemyPosition = _enemy.transform.position;
-            Vector2 dist = nodePosition - enemyPosition;
-            _enemy.IsRun = true;
-
-            _enemy.transform.position += (Vector3)dist.normalized * (_enemy.MoveSpeed * Time.deltaTime);
-            _enemy.animator.SetBool("Run" , _enemy.IsRun);
-
-            if (dist.normalized.x < 0.0f)
-                _enemy.spriteRenderer.flipX = true;
+                if (nodePosition.y > _enemy.dijkstra.Nodes[targetIndex].Position.y)
+                {
+                    nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position; //이동 할려는 노드의 위치
+                    enemyPosition = _enemy.transform.position; //적의 위치
+                    dist = nodePosition - enemyPosition; //적이 목표노드를 바라보는 방향
+                    _enemy.rigid.AddForce(
+                        ((Vector3.up * _enemy.JumpPower) + (Vector3)dist).normalized *
+                        _enemy.JumpPower, ForceMode2D.Impulse);
+                }
+                
+                
+            }
             else
-                _enemy.spriteRenderer.flipX = false;
+            {
+                targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
+            }
             
-
-            float distance = Vector2.Distance(nodePosition , enemyPosition);
-
-            if (distance < 0.2f)
-            {
-                if (_enemy.dijkstra.Nodes[targetIndex].IsJump == true)
-                    jumpCheck = true;
-                    
-                isArrival = true;
-            }
-
-            if (jumpCheck == true)
-            {
-                _enemy.rigid.AddForce((Vector3.up + (Vector3)dist.normalized).normalized * _enemy.JumpPower, ForceMode2D.Impulse);
-                jumpCheck = false;
-            }
-
-            //Debug.Log(dist.ToString());
-            // Debug.Log(dist.normalized.ToString());
         }
-        
+
+        //if (isArrival)
+        //{
+        //    targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
+        //    isArrival = false;
+        //    startTime = Time.time;
+        //}
+        //else
+        //{
+        //    Vector2 nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position;
+        //    Vector2 enemyPosition = _enemy.transform.position;
+        //    Vector2 dist = nodePosition - enemyPosition;
+        //    _enemy.IsRun = true;
+
+        //    if (jumpCheck)
+        //    {
+        //        Vector3 center =  _enemy.transform.position + (Vector3)_enemy.dijkstra.Nodes[targetIndex].Position * 0.5F;
+        //        center -= new Vector3(0, 1, 0);
+        //        Vector3 riseRelCenter = _enemy.transform.position - center;
+        //        Vector3 setRelCenter = (Vector3)_enemy.dijkstra.Nodes[targetIndex].Position - center;
+        //        float fracComplete = (Time.time - startTime) / journeyTime;
+        //        _enemy.transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, fracComplete);
+        //        _enemy.transform.position += center;
+        //        //startTime += Time.deltaTime * 0.1f;
+        //        Debug.Log(fracComplete.ToString());
+        //    }
+        //    else
+        //    {
+        //        Debug.Log("AA");
+        //        _enemy.transform.position += (Vector3)dist.normalized * (_enemy.MoveSpeed * Time.deltaTime);
+        //    }
+
+        //    _enemy.animator.SetBool("Run" , _enemy.IsRun);
+
+        //    if (dist.normalized.x < 0.0f)
+        //        _enemy.spriteRenderer.flipX = true;
+        //    else
+        //        _enemy.spriteRenderer.flipX = false;
+
+
+        //    float distance = Vector2.Distance(nodePosition , enemyPosition);
+
+        //    if (distance < 0.2f)
+        //    {
+        //        if (_enemy.dijkstra.Nodes[targetIndex].IsJump)
+        //            jumpCheck = true;
+        //        else
+        //            jumpCheck = false;
+        //        startTime = Time.time;
+        //        isArrival = true;
+        //    }
+        //}
+
         return false;
     }
     public override bool OnEnd(Enemy _enemy)

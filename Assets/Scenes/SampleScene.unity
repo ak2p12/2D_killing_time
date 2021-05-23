@@ -2505,7 +2505,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundInfo: {fileID: 0}
   MoveSpeed: 3
-  JumpPower: 19
+  JumpPower: 22
   AttackSpeed: 1
   MeleeDamage: 1
   MaxHP: 100

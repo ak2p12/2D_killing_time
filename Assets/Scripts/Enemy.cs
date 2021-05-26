@@ -23,17 +23,15 @@ public class Enemy : Unit
     Sequence sequene_1; //하나라도 false 면 false 반환
     Selecter selecter_1; //하나라도 true 면 true 반환
     Condition_IsDead condition_IsDead; //사망 유무 검사 
-    Condition_NotFind condition_NotFind; //타겟 발견 
-    Condition_TargetDistance condition_TargetDistance; //타겟과의 거리
+    Condition_NotFind condition_NotFind; //타겟 발견 못함 
+    Condition_Find condition_Find; //타겟 발견
+    Condition_TargetDistance_1 condition_TargetDistance_1; //타겟과의 거리
     Action_Dead action_Dead; //사망 행동 실행
     Action_Roaming action_Roaming; //적 찾기
     Action_Trace action_Trace; //추적
 
     
     [HideInInspector] public Dijkstra dijkstra; //다익스트라
-    
-    //
-
 
     [HideInInspector] public SpriteRenderer spriteRenderer;
     [HideInInspector] public Animator animator;
@@ -56,12 +54,32 @@ public class Enemy : Unit
         bt = new BehaviorTree();
         sequene_1 = new Sequence();
         selecter_1 = new Selecter();
-        action_Roaming = new Action_Roaming();
 
-        selecter_1.AddNode(action_Roaming);
+        condition_Find = new Condition_Find(); //타겟 발견하면 true
+        condition_NotFind = new Condition_NotFind(); //발견못하면 true
+        condition_IsDead = new Condition_IsDead(); //사망 하면 true
+
+        action_Trace = new Action_Trace();
+        action_Roaming = new Action_Roaming();
+        action_Dead = new Action_Dead();
+
+        condition_Find.SetNode(action_Trace);
+        condition_NotFind.SetNode(action_Roaming);
+        condition_IsDead.SetNode(action_Dead);
+
+        //selecter_1.AddNode(condition_Find);
+        selecter_1.AddNode(condition_NotFind);
         sequene_1.AddNode(selecter_1);
+        sequene_1.AddNode(condition_IsDead);
         bt.Init(sequene_1);
 
+        //selecter
+        //자식 노드중 하나라도 true 반환하면 즉시 true 반환
+        //자식 노드중 전부 false 반환하면 false 반환
+
+        //sequene
+        //자식 노드중 하나라도 false 반환하면 즉시 false 반환
+        //자식 노드중 전부 true 반환하면 true 반환
         StartCoroutine(Update_Coroutine());
     }
 
@@ -113,7 +131,6 @@ public class Enemy : Unit
     {
 
     }
-
     public override bool Hit(float _damege)
     {
         CurrentHP -= _damege;
@@ -121,7 +138,6 @@ public class Enemy : Unit
             CurrentHP = 0.0f;
         return true;
     }
-
     private void OnDrawGizmos()
     {
         if (IsFind)
@@ -158,7 +174,7 @@ public class Condition_IsDead : Condition
     {
         childNode = _node;
     }
-} //사망 판별
+} //사망 했다면
 
 public class Condition_NotFind : Condition
 {
@@ -186,9 +202,38 @@ public class Condition_NotFind : Condition
     {
         childNode = _node;
     }
-} //타켓 발견 못했을때
+} //타겟 발견 못하면
 
-public class Condition_TargetDistance : Condition
+public class Condition_Find : Condition
+{
+    public override bool ChackCondition(Enemy _enemy)
+    {
+        if (_enemy.IsFind)
+            return true;
+
+        return false;
+    }
+
+    public override bool Result(Enemy _enemy)
+    {
+        if (ChackCondition(_enemy))
+        {
+            if (childNode != null && childNode.Result(_enemy))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override void SetNode(Node _node)
+    {
+        childNode = _node;
+    }
+
+} //타겟을 발견하면 
+
+public class Condition_TargetDistance_1 : Condition
 {
     public override bool ChackCondition(Enemy _enemy)
     {
@@ -215,7 +260,7 @@ public class Condition_TargetDistance : Condition
     {
         childNode = _node;
     }
-}
+} //타겟과 거리가 가까우면
 
 public class TimeDelay : TimeOut
 {
@@ -265,13 +310,12 @@ public class TimeDelay : TimeOut
 
 public class Action_Roaming : ActionNode //적을 찾는 행위
 {
-    bool isArrival;
     int targetIndex;
-    bool jumpCheck;
     float startTime;
 
     public override void OnStart(Enemy _enemy)
     {
+        startTime = 3.0f;
         isStart = true;
         _enemy.IsRun = true;
         targetIndex = 9999;
@@ -290,12 +334,18 @@ public class Action_Roaming : ActionNode //적을 찾는 행위
 
         int random = Random.Range(0 , _enemy.dijkstra.Nodes.Length);
         _enemy.dijkstra.StartDijkstra(index , random);
-        //_enemy.dijkstra.StartDijkstra(0 , 6);
+        //_enemy.dijkstra.StartDijkstra(8 , 10);
 
         targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
     }
     public override bool OnUpdate(Enemy _enemy)
     {
+        if (startTime > 0.0f)
+        {
+            startTime -= Time.deltaTime;
+            return false;
+        }
+
         Vector2 nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position; //이동 할려는 노드의 위치
         Vector2 enemyPosition = _enemy.transform.position; //적의 위치
         Vector2 dist = nodePosition - enemyPosition; //적이 목표노드를 바라보는 방향
@@ -310,26 +360,30 @@ public class Action_Roaming : ActionNode //적을 찾는 행위
 
         float distance = Vector2.Distance(nodePosition, enemyPosition); //적과 목표노드까지의 거리
 
-        if (distance < 0.1f) 
+        if (distance < 0.2f) 
         {
             if (_enemy.dijkstra.Nodes[targetIndex].IsJump) //현재 위치에 있는 노드에서 점프를 해야 될 때
             {
+                if (_enemy.dijkstra.FinalIndex_Stack.Count == 0)
+                    return true;
+
                 targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
 
-                if (nodePosition.y > _enemy.dijkstra.Nodes[targetIndex].Position.y)
-                {
+                //if (nodePosition.y < _enemy.dijkstra.Nodes[targetIndex].Position.y)
+                //{
                     nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position; //이동 할려는 노드의 위치
                     enemyPosition = _enemy.transform.position; //적의 위치
                     dist = nodePosition - enemyPosition; //적이 목표노드를 바라보는 방향
                     _enemy.rigid.AddForce(
                         ((Vector3.up * _enemy.JumpPower) + (Vector3)dist).normalized *
                         _enemy.JumpPower, ForceMode2D.Impulse);
-                }
-                
-                
+                //}
             }
             else
             {
+                if (_enemy.dijkstra.FinalIndex_Stack.Count == 0)
+                    return true;
+
                 targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
             }
             
@@ -391,6 +445,8 @@ public class Action_Roaming : ActionNode //적을 찾는 행위
     }
     public override bool OnEnd(Enemy _enemy)
     {
+        _enemy.IsRun = false;
+        _enemy.animator.SetBool("Run", _enemy.IsRun);
         isStart = false;
         return true;
     }
@@ -406,8 +462,8 @@ public class Action_Roaming : ActionNode //적을 찾는 행위
 
         return false;
     }
-}
-//사망
+} //돌아다니기
+
 public class Action_Dead : ActionNode
 {
     float originTime;
@@ -457,16 +513,92 @@ public class Action_Dead : ActionNode
 
         return false;
     }
-}
+}//사망
 
 public class Action_Trace : ActionNode
 {
+    int targetIndex;
+
     public override void OnStart(Enemy _enemy)
     {
         isStart = true;
+        _enemy.IsRun = true;
+        targetIndex = 9999;
+
+        float enemyShortDist = 9999.0f;
+        int enemyStartIndex = 9999;
+
+        float targetShortDist = 9999.0f;
+        int targetStartIndex = 9999;
+
+        for (int i = 0; i < _enemy.dijkstra.Nodes.Length; ++i)
+        {
+            float dist = Vector2.Distance(_enemy.transform.position, _enemy.dijkstra.Nodes[i].Position);
+            if (dist < enemyShortDist)
+            {
+                enemyShortDist = dist;
+                enemyStartIndex = i;
+            }
+        }
+
+        for (int i = 0; i < _enemy.dijkstra.Nodes.Length; ++i)
+        {
+            float dist = Vector2.Distance(_enemy.target.transform.position, _enemy.dijkstra.Nodes[i].Position);
+            if (dist < targetShortDist)
+            {
+                targetShortDist = dist;
+                targetStartIndex = i;
+            }
+        }
+
+        _enemy.dijkstra.StartDijkstra(enemyStartIndex, targetStartIndex);
+
+        targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
     }
     public override bool OnUpdate(Enemy _enemy)
     {
+        Vector2 nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position; //이동 할려는 노드의 위치
+        Vector2 enemyPosition = _enemy.transform.position; //적의 위치
+        Vector2 dist = nodePosition - enemyPosition; //적이 목표노드를 바라보는 방향
+
+        _enemy.transform.position += (Vector3)dist.normalized * (_enemy.MoveSpeed * Time.deltaTime);
+        _enemy.animator.SetBool("Run", _enemy.IsRun);
+
+        if (dist.normalized.x < 0.0f) //적 캐릭터 방향
+            _enemy.spriteRenderer.flipX = true;
+        else
+            _enemy.spriteRenderer.flipX = false;
+
+        float distance = Vector2.Distance(nodePosition, enemyPosition); //적과 목표노드까지의 거리
+
+        if (distance < 0.2f)
+        {
+            if (_enemy.dijkstra.Nodes[targetIndex].IsJump) //현재 위치에 있는 노드에서 점프를 해야 될 때
+            {
+                if (_enemy.dijkstra.FinalIndex_Stack.Count == 0)
+                    return true;
+
+                targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
+
+                //if (nodePosition.y < _enemy.dijkstra.Nodes[targetIndex].Position.y)
+                //{
+                nodePosition = _enemy.dijkstra.Nodes[targetIndex].Position; //이동 할려는 노드의 위치
+                enemyPosition = _enemy.transform.position; //적의 위치
+                dist = nodePosition - enemyPosition; //적이 목표노드를 바라보는 방향
+                _enemy.rigid.AddForce(
+                    ((Vector3.up * _enemy.JumpPower) + (Vector3)dist).normalized *
+                    _enemy.JumpPower, ForceMode2D.Impulse);
+                //}
+            }
+            else
+            {
+                if (_enemy.dijkstra.FinalIndex_Stack.Count == 0)
+                    return true;
+
+                targetIndex = _enemy.dijkstra.FinalIndex_Stack.Pop();
+            }
+
+        }
         return false;
     }
     public override bool OnEnd(Enemy _enemy)
@@ -487,6 +619,6 @@ public class Action_Trace : ActionNode
 
         return false;
     }
-}
+} //추적
 
 
